@@ -1,4 +1,4 @@
-# AI知识管理平台 - Python 依赖包
+# IHG智能问答平台 - Python 依赖包
 # 安装命令: pip install -r requirements.txt
 
 # ========== Web 框架 ==========

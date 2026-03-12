@@ -1,5 +1,5 @@
 """
-AI知识管理平台 - Streamlit 前端
+IHG智能问答平台 - Streamlit 前端
 实现登录认证、角色权限展示、智能对话和文档管理
 """
 
@@ -13,7 +13,7 @@ from typing import Optional, Dict, Any, List
 # 页面配置
 # =============================================================================
 st.set_page_config(
-    page_title="AI知识管理平台",
+    page_title="IHG智能问答平台",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -117,7 +117,7 @@ def api_add_hot_knowledge(role: str, title: str, content: str) -> Dict[str, Any]
 def render_page_structure():
     """
     渲染页面统一结构：
-    1. 最上层：标题 "🤖 AI知识管理平台"
+    1. 最上层：标题 "🤖 IHG智能问答平台"
     2. 左侧边栏：功能导航菜单 + 底部用户信息和退出按钮
     3. 右侧主区域：具体页面内容
     """
@@ -129,7 +129,7 @@ def render_page_structure():
     role = st.session_state.user_role
 
     # ========== 第一层：标题区域 ==========
-    st.markdown("<h1 style='margin: 0; padding: 0;'>🤖 AI知识管理平台</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='margin: 0; padding: 0;'>🤖 IHG智能问答平台</h1>", unsafe_allow_html=True)
     st.markdown("---")
 
     # ========== 第二层：左侧边栏导航 + 右侧内容区域 ==========

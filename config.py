@@ -1,5 +1,5 @@
 """
-AI知识管理平台 - 配置文件
+IHG智能问答平台 - 配置文件
 集中管理所有配置项
 """
 
@@ -219,7 +219,7 @@ MOCK_HOT_KNOWLEDGE = [
 
 # 应用信息
 APP_INFO = {
-    "name": "AI知识管理平台",
+    "name": "IHG智能问答平台",
     "version": "1.0.0",
     "logo": "🤖",
     "company": "IHG Hotels & Resorts",

@@ -41,7 +41,7 @@ def kill_process_on_port(port):
 
 def main():
     print("=" * 60)
-    print("AI知识管理平台 - 启动诊断工具")
+    print("IHG智能问答平台 - 启动诊断工具")
     print("=" * 60)
     print()
 

@@ -1,5 +1,5 @@
 """
-AI知识管理平台 - 统一启动脚本
+IHG智能问答平台 - 统一启动脚本
 同时启动 FastAPI 后端和 Streamlit 前端
 """
 
@@ -50,7 +50,7 @@ def start_frontend():
 def main():
     """主函数"""
     print("=" * 70)
-    print(" " * 15 + "AI知识管理平台 - 统一启动脚本")
+    print(" " * 15 + "IHG智能问答平台 - 统一启动脚本")
     print("=" * 70)
     print()
     

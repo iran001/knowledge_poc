@@ -1,5 +1,5 @@
 """
-AI知识管理平台 - FastAPI 后端
+IHG智能问答平台 - FastAPI 后端
 使用Jinja2模板引擎和配置文件
 """
 
