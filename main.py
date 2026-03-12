@@ -29,7 +29,7 @@ def cleanup():
 
 def start_backend():
     """启动 FastAPI 后端"""
-    cmd = [sys.executable, "-m", "uvicorn", "backend_new:app", "--host", "0.0.0.0", "--port", "8000"]
+    cmd = [sys.executable, "-m", "uvicorn", "backend:app", "--host", "0.0.0.0", "--port", "8000"]
     log_file = open("backend.log", "w")
     return subprocess.Popen(cmd, stdout=log_file, stderr=subprocess.STDOUT)
 
