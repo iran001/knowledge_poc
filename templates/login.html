@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 登录页面专用样式 */
+    .login-page {
+        min-height: 100vh;
+        background-image: url('{{ background_image }}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    
+    .login-card {
+        background: rgba(200, 200, 200, 0.25);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        padding: 35px 30px;
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+    }
+    
+    .ihg-logo {
+        color: #B8A369;
+        font-size: 2.2rem;
+        font-weight: normal;
+        margin-bottom: 2px;
+        letter-spacing: 2px;
+        font-family: serif;
+    }
+    
+    .ihg-subtitle {
+        color: #B8A369;
+        font-size: 0.55rem;
+        letter-spacing: 3px;
+        margin-bottom: 15px;
+        font-weight: 300;
+    }
+    
+    .system-title {
+        color: white;
+        font-size: 0.9rem;
+        margin-bottom: 3px;
+        font-weight: 300;
+        letter-spacing: 0.5px;
+    }
+    
+    .sign-in-title {
+        color: white;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        font-weight: 400;
+    }
+    
+    .form-group {
+        margin-bottom: 12px;
+        text-align: left;
+    }
+    
+    .form-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.75rem;
+        margin-bottom: 5px;
+        display: block;
+        padding-left: 10px;
+    }
+    
+    .form-input {
+        background: rgba(230, 230, 230, 0.95);
+        border: none;
+        border-radius: 18px;
+        padding: 10px 15px;
+        font-size: 0.85rem;
+        color: #666;
+        width: 100%;
+        height: 36px;
+    }
+    
+    .form-input::placeholder {
+        color: #999;
+        font-size: 0.8rem;
+    }
+    
+    .btn-login {
+        background: #1a5276;
+        color: white;
+        border: none;
+        border-radius: 18px;
+        padding: 10px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        width: 100%;
+        margin-top: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-login:hover {
+        background: #154360;
+        box-shadow: 0 4px 12px rgba(26, 82, 118, 0.4);
+    }
+    
+    .login-links {
+        margin-top: 15px;
+    }
+    
+    .login-links a {
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+        font-size: 0.75rem;
+        display: block;
+        margin: 6px 0;
+    }
+    
+    .login-links a:hover {
+        color: white;
+        text-decoration: underline;
+    }
+    
+    .test-account {
+        margin-top: 15px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.75rem;
+    }
+    
+    .test-account summary {
+        cursor: pointer;
+    }
+    
+    .test-account table {
+        color: white;
+        font-size: 0.7rem;
+        margin-top: 8px;
+        width: 100%;
+    }
+    
+    .test-account th,
+    .test-account td {
+        padding: 4px 6px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .alert {
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        font-size: 0.85rem;
+    }
+    
+    .alert-error {
+        background: rgba(248, 215, 218, 0.9);
+        color: #721c24;
+    }
+    
+    .alert-warning {
+        background: rgba(255, 243, 205, 0.9);
+        color: #856404;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-page">
+    <div class="login-card">
+        <div class="ihg-logo">IHG<sup style="font-size:0.3em;">®</sup></div>
+        <div class="ihg-subtitle">HOTELS & RESORTS</div>
+        <div class="system-title">Knowledge Base Q&A System</div>
+        <div class="sign-in-title">Sign In</div>
+        
+        {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+        
+        {% if warning %}
+        <div class="alert alert-warning">{{ warning }}</div>
+        {% endif %}
+        
+        <form id="loginForm" action="/api/login-form" method="POST">
+            <div class="form-group">
+                <label class="form-label">Username or Email</label>
+                <input type="text" name="username" class="form-input" placeholder="👤 Username" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-input" placeholder="🔒 Password" required>
+            </div>
+            
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+        
+        <div class="login-links">
+            <a href="#">Forgot Password?</a>
+            <a href="#">Create Account</a>
+        </div>
+        
+        <details class="test-account">
+            <summary>📋 Test Account</summary>
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                </tr>
+                <tr>
+                    <td>admin</td>
+                    <td>123456</td>
+                    <td>Administrator</td>
+                </tr>
+                <tr>
+                    <td>manager</td>
+                    <td>123456</td>
+                    <td>Manager</td>
+                </tr>
+                <tr>
+                    <td>reception</td>
+                    <td>123456</td>
+                    <td>Reception</td>
+                </tr>
+            </table>
+        </details>
+    </div>
+</div>
+{% endblock %}

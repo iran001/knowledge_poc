@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .back-link {
+        margin-bottom: 20px;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .form-section h3 {
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95rem;
+    }
+    
+    .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    .knowledge-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .knowledge-item {
+        background: #fff3e0;
+        border-left: 4px solid #ff9800;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .knowledge-title {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .knowledge-content {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .knowledge-meta {
+        font-size: 0.8rem;
+        color: #999;
+    }
+    
+    .tag-priority {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        margin-left: 10px;
+    }
+    
+    .tag-high {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .tag-normal {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .tag-low {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="page-title">🔥 {{ page_title }}</h2>
+
+<!-- 返回链接 -->
+<div class="back-link">
+    <a href="/page/documents" class="btn btn-secondary">← 返回文档中心</a>
+</div>
+
+<!-- 添加新热知识 -->
+<div class="form-section">
+    <h3>➕ 添加新热知识</h3>
+    <form method="POST" action="/api/hot-knowledge-form">
+        <div class="form-group">
+            <label>标题</label>
+            <input type="text" name="title" placeholder="输入热知识标题" required>
+        </div>
+        
+        <div class="form-group">
+            <label>内容</label>
+            <textarea name="content" placeholder="输入热知识详细内容" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>优先级</label>
+            <select name="priority">
+                <option value="low">低</option>
+                <option value="normal" selected>中</option>
+                <option value="high">高</option>
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">添加热知识</button>
+    </form>
+</div>
+
+<!-- 现有热知识列表 -->
+<div class="form-section">
+    <h3>📋 现有热知识</h3>
+    <div class="knowledge-list">
+        {% if knowledge_list %}
+            {% for item in knowledge_list %}
+            <div class="knowledge-item">
+                <div class="knowledge-title">
+                    {{ item.title }}
+                    <span class="tag-priority tag-{{ item.priority }}">
+                        {% if item.priority == 'high' %}高{% elif item.priority == 'normal' %}中{% else %}低{% endif %}
+                    </span>
+                </div>
+                <div class="knowledge-content">{{ item.content }}</div>
+                <div class="knowledge-meta">添加日期: {{ item.added_at }}</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>暂无热知识</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+============================================================
+AI知识管理平台 - FastAPI 后端服务
+============================================================
+服务地址: http://localhost:8000
+API文档: http://localhost:8000/docs
+============================================================
+INFO:     Will watch for changes in these directories: ['c:\\Users\\Thinkpad\\Desktop\\IHG-POC\\source']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [3180] using StatReload
+INFO:     Started server process [4740]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'test_integration.py'. Reloading...
+ INFO:     127.0.0.1:52001 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52001 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52002 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52206 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52231 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52245 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52247 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52278 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52379 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52524 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52712 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52765 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52774 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52943 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52945 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53086 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53090 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53319 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53329 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53335 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53365 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53388 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53438 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53441 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53442 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53443 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53454 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53627 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53629 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53639 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53736 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53750 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53751 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53752 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53758 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53759 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53762 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53763 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53764 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53905 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53927 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53938 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53942 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53945 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54066 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54304 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54536 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54560 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54561 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54567 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54577 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54578 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54590 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54591 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54761 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54784 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54795 - "POST /api/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54810 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54834 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55160 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55192 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55198 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55213 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55214 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55224 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55239 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55248 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55259 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55279 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55281 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55282 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55402 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55415 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55482 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55496 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55822 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55825 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55837 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56190 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56426 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56538 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56585 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56647 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56758 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56890 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56979 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57006 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57023 - "GET /api/hot-knowledge?role=admin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58455 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58481 - "POST /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63019 - "POST /api/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63529 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63529 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63530 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64338 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64339 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64469 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64755 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64755 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64767 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64773 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64773 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64834 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64834 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65269 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65272 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65411 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65412 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65414 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65414 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65414 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65414 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65414 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65414 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49277 - "GET /api HTTP/1.1" 404 Not Found

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: flex-end;
+    }
+    
+    .search-input {
+        flex: 1;
+        max-width: 400px;
+    }
+    
+    .search-input input {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95rem;
+    }
+    
+    .stats-bar {
+        margin-bottom: 20px;
+    }
+    
+    .stat-item {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-right: 10px;
+    }
+    
+    .stat-blue {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+    
+    .stat-purple {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+    
+    .document-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .document-item {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .document-item:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .doc-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .doc-title {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .doc-meta {
+        display: flex;
+        gap: 15px;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .doc-summary {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+    }
+    
+    .admin-link {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="page-title">📄 {{ page_title }}</h2>
+
+<!-- 管理员热知识管理入口 -->
+{% if user.role == 'admin' %}
+<div class="admin-link">
+    <a href="/page/hot-knowledge" class="btn btn-primary">🔥 热知识管理</a>
+</div>
+{% endif %}
+
+<!-- 搜索栏 -->
+<form class="search-bar" method="GET" action="/page/documents">
+    <div class="search-input">
+        <input type="text" name="keyword" value="{{ keyword }}" placeholder="输入关键词搜索文档...">
+    </div>
+    <button type="submit" class="btn btn-secondary">🔍 搜索</button>
+    {% if user.role == 'admin' %}
+    <a href="/page/hot-knowledge" class="btn btn-primary">🔥 热知识管理</a>
+    {% endif %}
+</form>
+
+<!-- 统计信息 -->
+<div class="stats-bar">
+    <span class="stat-item stat-blue">共找到 <strong>{{ total_count }}</strong> 个文档</span>
+    <span class="stat-item stat-purple">权限级别: {{ visible_permission }}</span>
+</div>
+
+<!-- 文档列表 -->
+<div class="document-list">
+    {% if documents %}
+        {% for doc in documents %}
+        <div class="document-item" onclick="toggleDetail('{{ doc.id }}')">
+            <div class="doc-header">
+                <span class="doc-title">📄 {{ doc.title }}</span>
+                <span class="tag tag-{% if doc.permission_level == 1 %}green{% elif doc.permission_level == 2 %}orange{% else %}red{% endif %}">
+                    {% if doc.permission_level == 1 %}🟢 公开{% elif doc.permission_level == 2 %}🟠 内部{% else %}🔴 敏感{% endif %}
+                </span>
+            </div>
+            <div class="doc-meta">
+                <span>类型: {{ doc.type }}</span>
+                <span>更新日期: {{ doc.updated_at }}</span>
+            </div>
+            <div class="doc-summary" id="summary-{{ doc.id }}">
+                {{ doc.content[:100] }}...
+            </div>
+            <div class="doc-detail" id="detail-{{ doc.id }}" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                <p><strong>完整内容:</strong></p>
+                <p>{{ doc.content }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <p>📭 没有找到符合条件的文档</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleDetail(docId) {
+        const detail = document.getElementById('detail-' + docId);
+        if (detail.style.display === 'none') {
+            detail.style.display = 'block';
+        } else {
+            detail.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}
