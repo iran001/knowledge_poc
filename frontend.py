@@ -170,261 +170,32 @@ def render_page_structure():
 
 
 def render_login_page():
-    """渲染登录页面 - IHG风格"""
-
-    # 自定义CSS样式 - IHG风格登录页（与参考图片相同风格）
+    """渲染登录页面 - 使用iframe嵌入后端登录页面模板"""
+    
+    # 隐藏Streamlit默认元素，全屏显示登录页面
     st.markdown("""
     <style>
-    /* 页面背景 - 与参考图片相同的酒店房间背景 */
-    .stApp {
-        background-image: url('https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1920');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        overflow: hidden;
-    }
-
-    /* 隐藏默认的Streamlit元素 */
     #MainMenu {visibility: hidden;}
     header {visibility: hidden;}
     footer {visibility: hidden;}
-
-    /* 主容器 - 全屏居中 */
-    .main-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        width: 100vw;
-        padding: 10px;
-        box-sizing: border-box;
-    }
-
-    /* 登录卡片 - 毛玻璃效果 */
-    .login-card {
-        background: rgba(200, 200, 200, 0.25);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border-radius: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        padding: 25px 30px;
-        width: 100%;
-        max-width: 300px;
-        text-align: center;
-    }
-
-    /* IHG品牌色 */
-    .ihg-logo {
-        color: #B8A369;
-        font-size: 2rem;
-        font-weight: normal;
-        margin-bottom: 2px;
-        letter-spacing: 2px;
-        font-family: serif;
-    }
-
-    .ihg-subtitle {
-        color: #B8A369;
-        font-size: 0.55rem;
-        letter-spacing: 3px;
-        margin-bottom: 12px;
-        font-weight: 300;
-    }
-
-    /* 系统标题 */
-    .system-title {
-        color: white;
-        font-size: 0.9rem;
-        margin-bottom: 2px;
-        font-weight: 300;
-        letter-spacing: 0.5px;
-    }
-
-    .sign-in-title {
-        color: white;
-        font-size: 1.1rem;
-        margin-bottom: 15px;
-        font-weight: 400;
-    }
-
-    /* 表单容器 */
-    .form-container {
-        max-width: 240px;
-        margin: 0 auto;
-    }
-
-    /* 输入框标签 */
-    .input-label {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.7rem;
-        margin-bottom: 4px;
-        display: block;
-        text-align: left;
-        padding-left: 10px;
-    }
-
-    /* 输入框样式 */
-    .stTextInput > div > div > input {
-        background: rgba(230, 230, 230, 0.95) !important;
-        border: none !important;
-        border-radius: 18px !important;
-        padding: 8px 15px !important;
-        font-size: 0.85rem !important;
-        color: #666 !important;
-        height: 36px !important;
-    }
-
-    .stTextInput > div > div > input::placeholder {
-        color: #999 !important;
-        font-size: 0.8rem;
-    }
-
-    /* 输入框容器 */
-    .stTextInput {
-        margin-bottom: 8px !important;
-    }
-
-    .stTextInput > div {
-        max-width: 240px;
-        margin: 0 auto;
-    }
-
-    /* 登录按钮 */
-    .stButton > button {
-        background: #1a5276 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 18px !important;
-        padding: 8px !important;
-        font-size: 0.9rem !important;
-        font-weight: 500 !important;
-        width: 240px !important;
-        margin: 12px auto 0 !important;
-        display: block !important;
-        height: 36px !important;
-        line-height: 20px !important;
-    }
-
-    .stButton > button:hover {
-        background: #154360 !important;
-        box-shadow: 0 4px 12px rgba(26, 82, 118, 0.4) !important;
-    }
-
-    /* 底部链接 */
-    .login-links {
-        margin-top: 12px;
-    }
-
-    .login-links a {
-        color: rgba(255, 255, 255, 0.85);
-        text-decoration: none;
-        font-size: 0.75rem;
-        display: block;
-        margin: 4px 0;
-    }
-
-    .login-links a:hover {
-        color: white;
-        text-decoration: underline;
-    }
-
-    /* 测试账号提示 */
-    .test-account {
-        margin-top: 10px;
-        max-width: 240px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .test-account summary {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 0.75rem;
-        cursor: pointer;
-    }
-
-    .test-account table {
-        color: white;
-        font-size: 0.7rem;
-        margin-top: 6px;
-    }
-
-    .test-account th, .test-account td {
-        padding: 3px 6px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    /* 隐藏Streamlit默认边距 */
     .block-container {
         padding: 0 !important;
         max-width: 100% !important;
     }
-
-    /* 隐藏顶部装饰线 */
-    .stApp > header {
-        display: none;
-    }
     </style>
-
-    <!-- 登录卡片HTML -->
-    <div class="main-container">
-        <div class="login-card">
-            <div class="ihg-logo">IHG<sup style="font-size:0.3em;">®</sup></div>
-            <div class="ihg-subtitle">HOTELS & RESORTS</div>
-            <div class="system-title">Knowledge Base Q&A System</div>
-            <div class="sign-in-title">Sign In</div>
-            <div class="form-container">
     """, unsafe_allow_html=True)
-
-    # 用户名输入
-    st.markdown('<span class="input-label">Username or Email</span>', unsafe_allow_html=True)
-    username = st.text_input("", placeholder="👤 Username", key="login_user", label_visibility="collapsed")
-
-    # 密码输入
-    st.markdown('<span class="input-label">Password</span>', unsafe_allow_html=True)
-    password = st.text_input("", type="password", placeholder="🔒 Password", key="login_pass", label_visibility="collapsed")
-
-    # 登录按钮
-    login_clicked = st.button("Login", key="login_btn")
-
-    # 结束form-container和登录卡片
-    st.markdown("""
-            </div>
-            <div class="login-links">
-                <a href="#">Forgot Password?</a>
-                <a href="#">Create Account</a>
-            </div>
+    
+    # 使用iframe嵌入后端登录页面（加载templates/login.html模板）
+    st.markdown(f"""
+    <iframe
+        src="{API_BASE_URL}/"
+        style="width: 100%; height: 100vh; border: none; position: fixed; top: 0; left: 0;"
+        frameborder="0"
+        allow="fullscreen">
+    </iframe>
     """, unsafe_allow_html=True)
+    
 
-    # 测试账号提示
-    with st.expander("📋 Test Account"):
-        st.markdown("""
-        | Username | Password | Role |
-        |----------|----------|------|
-        | admin | 123456 | Administrator |
-        | manager | 123456 | Manager |
-        | reception | 123456 | Reception |
-        """)
-
-    # 结束main-container
-    st.markdown("</div></div>", unsafe_allow_html=True)
-
-    # 处理登录逻辑
-    if login_clicked:
-        if username and password:
-            with st.spinner("Signing in..."):
-                result = api_login(username, password)
-
-                if result.get("success"):
-                    st.session_state.authenticated = True
-                    st.session_state.current_user = result.get("user")
-                    st.session_state.user_role = result.get("user", {}).get("role")
-                    st.session_state.page = "chat"
-                    st.rerun()
-                else:
-                    st.error(result.get("message", "Invalid username or password"))
-        else:
-            st.warning("Please enter both username and password")
 
 
 def render_chat_page():

@@ -106,13 +106,6 @@
 {% block content %}
 <h2 class="page-title">📄 {{ page_title }}</h2>
 
-<!-- 管理员热知识管理入口 -->
-{% if user.role == 'admin' %}
-<div class="admin-link">
-    <a href="/page/hot-knowledge" class="btn btn-primary">🔥 热知识管理</a>
-</div>
-{% endif %}
-
 <!-- 搜索栏 -->
 <form class="search-bar" method="GET" action="/page/documents">
     <div class="search-input">
@@ -120,7 +113,7 @@
     </div>
     <button type="submit" class="btn btn-secondary">🔍 搜索</button>
     {% if user.role == 'admin' %}
-    <a href="/page/hot-knowledge" class="btn btn-primary">🔥 热知识管理</a>
+    <a href="/page/hot-knowledge" class="btn btn-secondary">🔥 热知识管理</a>
     {% endif %}
 </form>
 

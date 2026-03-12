@@ -278,14 +278,6 @@
                 <div class="sidebar-title">功能导航</div>
                 <a href="/page/chat" class="nav-item {% if active_page == 'chat' %}active{% endif %}">💬 智能对话</a>
                 <a href="/page/documents" class="nav-item {% if active_page == 'documents' %}active{% endif %}">📄 文档中心</a>
-                {% if user.role == 'admin' %}
-                <a href="/page/hot-knowledge" class="nav-item {% if active_page == 'hot_knowledge' %}active{% endif %}">🔥 热知识管理</a>
-                {% endif %}
-            </div>
-            
-            <div class="sidebar-footer">
-                <div class="user-info">👤 {{ user.display_name }}</div>
-                <button class="btn btn-secondary" style="width: 100%;" onclick="logout()">🚪 退出登录</button>
             </div>
         </div>
         
@@ -295,7 +287,7 @@
         </div>
     </div>
     {% else %}
-        {% block content %}{% endblock %}
+        {% block fullpage_content %}{% endblock %}
     {% endif %}
     
     <script>
