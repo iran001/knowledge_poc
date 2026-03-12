@@ -1,266 +1,251 @@
 """
-IHG智能问答平台 - 配置文件
-集中管理所有配置项
+IHG智能问答平台 - 统一配置文件
 """
 
 import os
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 # =============================================================================
-# 基础配置
+# 服务器配置
 # =============================================================================
-
-# 服务配置
 SERVER_CONFIG = {
     "host": "0.0.0.0",
     "backend_port": 8000,
     "frontend_port": 8501,
-    "reload": False,
+    "reload": True
 }
 
-# 调试模式
-DEBUG = os.environ.get("DEBUG", "false").lower() == "true"
-
 # =============================================================================
-# 外部服务配置
-# =============================================================================
-
 # Dify API 配置
+# =============================================================================
 DIFY_CONFIG = {
     "base_url": "http://116.62.30.61/v1",
     "chatbot_url": "http://116.62.30.61/chatbot/RgIwnnnxUrynbPCN",
-    "api_key": os.environ.get("DIFY_API_KEY", ""),  # 从环境变量读取
-    "timeout": 60,
+    "timeout": 30
 }
 
-# RagFlow API 配置
+# =============================================================================
+# RAGFlow API 配置
+# =============================================================================
 RAGFLOW_CONFIG = {
-    "base_url": "http://118.31.184.47/user-setting/api",
-    "api_key": os.environ.get("RAGFLOW_API_KEY", ""),  # 从环境变量读取
-    "timeout": 30,
+    "base_url": "http://localhost:9380",
+    "api_key": "your-api-key-here",
+    "timeout": 30
 }
 
 # =============================================================================
-# 角色与权限配置
+# 应用信息
 # =============================================================================
+APP_INFO = {
+    "name": "IHG智能问答平台",
+    "version": "1.0.0",
+    "logo": "🤖",
+    "description": "支持RBAC权限控制的AI知识管理系统"
+}
 
-# 角色类型
-ROLE_TYPES = ["admin", "manager", "reception"]
+# =============================================================================
+# 页面配置
+# =============================================================================
+PAGE_CONFIG = {
+    "login": {
+        "title": "登录",
+        "background_image": "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1920"
+    },
+    "chat": {
+        "title": "智能对话",
+        "welcome_message": "您好！我是IHG智能助手，请问有什么可以帮助您？"
+    },
+    "documents": {
+        "title": "文档中心"
+    },
+    "hot_knowledge": {
+        "title": "热知识管理"
+    }
+}
 
+# =============================================================================
 # 角色显示映射
-ROLE_DISPLAY_MAP = {
+# =============================================================================
+ROLE_DISPLAY_MAP: Dict[str, Dict[str, Any]] = {
     "admin": {"name": "系统管理员", "color": "🔴", "desc": "拥有最高权限，可访问所有数据和配置"},
     "manager": {"name": "客服经理", "color": "🟠", "desc": "可访问标准文档和案例分析"},
-    "reception": {"name": "前台", "color": "🟢", "desc": "仅可访问公开文档和基础问答"},
+    "reception": {"name": "前台", "color": "🟢", "desc": "仅可访问公开文档和基础问答"}
 }
 
-# 角色权限级别映射（数值越大权限越高）
+# =============================================================================
+# 角色权限级别映射（用于RBAC）
+# =============================================================================
 ROLE_LEVEL_MAP = {
-    "reception": 1,   # 前台 - 基础权限
-    "manager": 2,     # 客服经理 - 中等权限
-    "admin": 3        # 系统管理员 - 最高权限
+    "admin": 3,
+    "manager": 2,
+    "reception": 1
 }
 
-# 【核心】角色-System Prompt 映射表
-# 这是实现"基于角色的AI回答控制"的关键配置
+# =============================================================================
+# 角色Prompt映射（用于动态注入）
+# =============================================================================
 ROLE_PROMPT_MAP = {
-    "admin": """你是系统管理员助手。你可以访问所有层级数据，包括敏感配置和底层日志。
-回答需专业、严谨，协助进行系统维护和策略制定。
-你可以回答关于系统架构、数据库配置、安全策略等高级话题。
-如果涉及关键操作，请提醒用户谨慎执行。""",
-
-    "manager": """你是客服经理助手。你只能访问已发布的标准知识库和热点案例。
-严禁回答关于系统底层架构、数据库密码或未审核的冲突内容。
-回答需侧重于服务流程优化和案例分析。
-你的职责是帮助客服经理提升团队服务质量和处理客户投诉。""",
-
-    "reception": """你是前台接待助手。你只能回答基于公开文档的基础问题（如营业时间、基本政策）。
-遇到复杂、模糊或涉及内部流程的问题，请礼貌引导用户联系客服经理，严禁编造信息。
-你的回答应该简洁、友好、专业。"""
+    "admin": """你是IHG酒店的系统管理员助手，拥有最高权限。
+你可以访问所有文档和数据，包括财务信息、人事档案、系统配置等敏感内容。
+请以专业、高效的方式回答管理员的问题。""",
+    
+    "manager": """你是IHG酒店的客服经理助手，拥有标准权限。
+你可以访问标准操作文档、案例分析、客户反馈等资料。
+请帮助经理处理客户投诉、分析服务问题、提供改进建议。""",
+    
+    "reception": """你是IHG酒店的前台助手，拥有基础权限。
+你只能访问公开的操作手册、常见问题解答、酒店设施介绍等基础文档。
+请友好地回答客人的咨询问题，帮助他们办理入住、了解酒店服务。"""
 }
 
 # =============================================================================
-# Mock 数据配置
+# 模板和静态文件目录
 # =============================================================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-# Mock 用户数据
-MOCK_USERS = {
+# =============================================================================
+# 模拟用户数据
+# =============================================================================
+MOCK_USERS: Dict[str, Dict[str, Any]] = {
     "admin": {
         "username": "admin",
         "password": "123456",
         "role": "admin",
-        "display_name": "系统管理员",
-        "created_at": "2024-01-01"
+        "display_name": "系统管理员"
     },
     "manager": {
         "username": "manager",
         "password": "123456",
         "role": "manager",
-        "display_name": "客服经理",
-        "created_at": "2024-01-01"
+        "display_name": "客服经理"
     },
     "reception": {
         "username": "reception",
         "password": "123456",
         "role": "reception",
-        "display_name": "前台",
-        "created_at": "2024-01-01"
+        "display_name": "前台接待"
     }
 }
 
-# Mock 文档数据
-MOCK_DOCUMENTS = [
+# =============================================================================
+# 模拟文档数据（带权限级别）
+# =============================================================================
+MOCK_DOCUMENTS: List[Dict[str, Any]] = [
     {
         "id": "doc_001",
-        "title": "公司介绍",
-        "type": "公开文档",
-        "content": "欢迎了解我们公司...",
+        "title": "酒店员工手册",
+        "content": "包含所有员工的基本行为规范和操作流程，适用于所有员工。",
         "permission_level": 1,
-        "created_at": "2024-01-15",
-        "updated_at": "2024-03-01"
+        "category": "基础文档",
+        "updated_at": "2024-01-15"
     },
     {
         "id": "doc_002",
-        "title": "营业时间",
-        "type": "公开文档",
-        "content": "周一至周五 9:00-18:00...",
+        "title": "前台接待流程指南",
+        "content": "详细说明前台接待客人的标准流程，包括入住、退房、咨询等环节。",
         "permission_level": 1,
-        "created_at": "2024-01-15",
-        "updated_at": "2024-02-20"
+        "category": "操作手册",
+        "updated_at": "2024-01-20"
     },
     {
         "id": "doc_003",
-        "title": "基本服务政策",
-        "type": "公开文档",
-        "content": "我们的服务承诺...",
-        "permission_level": 1,
-        "created_at": "2024-01-20",
-        "updated_at": "2024-03-05"
+        "title": "客户投诉处理案例集",
+        "content": "收集整理了50个典型客户投诉案例及处理方案，供管理人员参考。",
+        "permission_level": 2,
+        "category": "案例分析",
+        "updated_at": "2024-02-01"
     },
     {
         "id": "doc_004",
-        "title": "客服培训手册",
-        "type": "内部资料",
-        "content": "客服标准话术...",
-        "permission_level": 2,
-        "created_at": "2024-02-01",
-        "updated_at": "2024-03-10"
+        "title": "月度财务报表分析",
+        "content": "包含本月收入、支出、利润分析，以及各部门业绩对比。仅供管理层查看。",
+        "permission_level": 3,
+        "category": "财务数据",
+        "updated_at": "2024-02-15"
     },
     {
         "id": "doc_005",
-        "title": "热点投诉案例分析",
-        "type": "内部资料",
-        "content": "2024年Q1投诉分析...",
-        "permission_level": 2,
-        "created_at": "2024-02-15",
-        "updated_at": "2024-03-08"
-    },
-    {
-        "id": "doc_006",
-        "title": "服务流程优化指南",
-        "type": "内部资料",
-        "content": "如何优化客户接待流程...",
-        "permission_level": 2,
-        "created_at": "2024-02-20",
-        "updated_at": "2024-03-12"
-    },
-    {
-        "id": "doc_007",
-        "title": "系统架构文档",
-        "type": "敏感资料",
-        "content": "系统技术架构详情...",
+        "title": "员工绩效评估标准",
+        "content": "详细的员工绩效考核标准和评估表，涉及薪酬调整等敏感信息。",
         "permission_level": 3,
-        "created_at": "2024-01-10",
-        "updated_at": "2024-03-01"
-    },
-    {
-        "id": "doc_008",
-        "title": "数据库配置说明",
-        "type": "敏感资料",
-        "content": "数据库连接配置...",
-        "permission_level": 3,
-        "created_at": "2024-01-12",
-        "updated_at": "2024-02-28"
-    },
-    {
-        "id": "doc_009",
-        "title": "安全策略文档",
-        "type": "敏感资料",
-        "content": "系统安全策略...",
-        "permission_level": 3,
-        "created_at": "2024-01-15",
-        "updated_at": "2024-03-10"
-    },
-    {
-        "id": "doc_010",
-        "title": "审计日志规范",
-        "type": "敏感资料",
-        "content": "系统审计规范...",
-        "permission_level": 3,
-        "created_at": "2024-02-01",
-        "updated_at": "2024-03-15"
+        "category": "人事档案",
+        "updated_at": "2024-02-10"
     }
 ]
 
-# Mock 热知识数据
-MOCK_HOT_KNOWLEDGE = [
+# =============================================================================
+# 模拟热知识数据
+# =============================================================================
+MOCK_HOT_KNOWLEDGE: List[Dict[str, Any]] = [
     {
         "id": "hot_001",
-        "title": "春节期间营业时间调整",
-        "content": "2024年春节假期调整为...",
-        "added_at": "2024-02-01",
-        "priority": "high"
+        "title": "VIP客人入住提醒",
+        "content": "本周末有3位VIP客人入住，请前台特别关注并提前准备欢迎礼品。",
+        "priority": "high",
+        "added_at": "2024-03-10"
+    },
+    {
+        "id": "hot_002",
+        "title": "空调系统维护通知",
+        "content": "3月15日凌晨2-4点将进行空调系统维护，届时部分区域可能受到影响。",
+        "priority": "medium",
+        "added_at": "2024-03-12"
+    },
+    {
+        "id": "hot_003",
+        "title": "新员工培训资料",
+        "content": "本月入职的5名新员工培训资料已更新，请经理安排培训时间。",
+        "priority": "low",
+        "added_at": "2024-03-11"
     }
 ]
 
 # =============================================================================
-# UI 配置
+# Streamlit前端配置（仅在导入streamlit时使用）
 # =============================================================================
+try:
+    import streamlit as st
 
-# 应用信息
-APP_INFO = {
-    "name": "IHG智能问答平台",
-    "version": "1.0.0",
-    "logo": "🤖",
-    "company": "IHG Hotels & Resorts",
-    "system_name": "Knowledge Base Q&A System",
-}
+    def init_page_config():
+        """初始化页面配置"""
+        st.set_page_config(
+            page_title="IHG智能问答平台",
+            page_icon="🤖",
+            layout="wide",
+            initial_sidebar_state="expanded"
+        )
 
-# 页面配置
-PAGE_CONFIG = {
-    "login": {
-        "title": "Sign In",
-        "background_image": "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1920",
-    },
-    "chat": {
-        "title": "智能对话",
-        "iframe_height": "80vh",
-    },
-    "documents": {
-        "title": "文档中心",
-    },
-    "hot_knowledge": {
-        "title": "热知识管理",
-    }
-}
+    def init_session_state():
+        """初始化 Streamlit Session State"""
+        if "authenticated" not in st.session_state:
+            st.session_state.authenticated = False
+        if "current_user" not in st.session_state:
+            st.session_state.current_user = None
+        if "user_role" not in st.session_state:
+            st.session_state.user_role = None
+        if "page" not in st.session_state:
+            st.session_state.page = "login"
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+        if "documents" not in st.session_state:
+            st.session_state.documents = []
+
+except ImportError:
+    # 当streamlit未安装时（后端环境），提供空函数
+    def init_page_config():
+        pass
+
+    def init_session_state():
+        pass
+
 
 # =============================================================================
-# 路径配置
+# 前端全局常量配置
 # =============================================================================
+# 自动检测后端地址（支持同站点部署和独立部署）
+API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
 
-# 基础路径
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# 模板路径
-TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
-
-# 静态文件路径
-STATIC_DIR = os.path.join(BASE_DIR, "static")
-
-# 日志路径
-LOG_DIR = os.path.join(BASE_DIR, "logs")
-
-# 确保目录存在
-os.makedirs(TEMPLATE_DIR, exist_ok=True)
-os.makedirs(STATIC_DIR, exist_ok=True)
-os.makedirs(LOG_DIR, exist_ok=True)
+# Dify 聊天机器人URL
+DIFY_CHATBOT_URL = "http://116.62.30.61/chatbot/RgIwnnnxUrynbPCN"
