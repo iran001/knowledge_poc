@@ -1,0 +1,259 @@
+2026-03-12 13:34:42.749 
+Warning: the config option 'server.enableCORS=false' is not compatible with
+'server.enableXsrfProtection=true'.
+As a result, 'server.enableCORS' is being overridden to 'true'.
+
+More information:
+In order to protect against CSRF attacks, we send a cookie with each request.
+To do so, we must specify allowable origins, which places a restriction on
+cross-origin resource sharing.
+
+If cross origin resource sharing is required, please disable server.enableXsrfProtection.
+            
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://10.134.106.14:8501
+  External URL: http://223.104.148.88:8501
+
+2026-03-12 13:34:44.828 `label` got an empty value. This is discouraged for accessibility reasons and may be disallowed in the future by raising an exception. Please provide a non-empty label and hide it with label_visibility if needed.
+Stack (most recent call last):
+  File "C:\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+  File "C:\Python314\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 379, in _run_script_thread
+    self._run_script(request.rerun_data)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 705, in _run_script
+    ) = exec_func_with_error_handling(code_to_exec, ctx)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 641, in <module>
+    main()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 619, in main
+    render_login_page()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 381, in render_login_page
+    username = st.text_input("", placeholder="\U0001f464 Username", key="login_user", label_visibility="collapsed")
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\metrics_util.py", line 532, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 322, in text_input
+    return self._text_input(
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 371, in _text_input
+    maybe_raise_label_warnings(label, label_visibility)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\lib\policies.py", line 187, in maybe_raise_label_warnings
+    _LOGGER.warning(
+2026-03-12 13:34:44.831 `label` got an empty value. This is discouraged for accessibility reasons and may be disallowed in the future by raising an exception. Please provide a non-empty label and hide it with label_visibility if needed.
+Stack (most recent call last):
+  File "C:\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+  File "C:\Python314\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 379, in _run_script_thread
+    self._run_script(request.rerun_data)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 705, in _run_script
+    ) = exec_func_with_error_handling(code_to_exec, ctx)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 641, in <module>
+    main()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 619, in main
+    render_login_page()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 385, in render_login_page
+    password = st.text_input("", type="password", placeholder="\U0001f512 Password", key="login_pass", label_visibility="collapsed")
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\metrics_util.py", line 532, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 322, in text_input
+    return self._text_input(
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 371, in _text_input
+    maybe_raise_label_warnings(label, label_visibility)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\lib\policies.py", line 187, in maybe_raise_label_warnings
+    _LOGGER.warning(
+2026-03-12 13:34:51.124 `label` got an empty value. This is discouraged for accessibility reasons and may be disallowed in the future by raising an exception. Please provide a non-empty label and hide it with label_visibility if needed.
+Stack (most recent call last):
+  File "C:\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+  File "C:\Python314\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 379, in _run_script_thread
+    self._run_script(request.rerun_data)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 705, in _run_script
+    ) = exec_func_with_error_handling(code_to_exec, ctx)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 641, in <module>
+    main()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 619, in main
+    render_login_page()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 381, in render_login_page
+    username = st.text_input("", placeholder="\U0001f464 Username", key="login_user", label_visibility="collapsed")
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\metrics_util.py", line 532, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 322, in text_input
+    return self._text_input(
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 371, in _text_input
+    maybe_raise_label_warnings(label, label_visibility)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\lib\policies.py", line 187, in maybe_raise_label_warnings
+    _LOGGER.warning(
+2026-03-12 13:34:51.127 `label` got an empty value. This is discouraged for accessibility reasons and may be disallowed in the future by raising an exception. Please provide a non-empty label and hide it with label_visibility if needed.
+Stack (most recent call last):
+  File "C:\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+  File "C:\Python314\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 379, in _run_script_thread
+    self._run_script(request.rerun_data)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 705, in _run_script
+    ) = exec_func_with_error_handling(code_to_exec, ctx)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 641, in <module>
+    main()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 619, in main
+    render_login_page()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 385, in render_login_page
+    password = st.text_input("", type="password", placeholder="\U0001f512 Password", key="login_pass", label_visibility="collapsed")
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\metrics_util.py", line 532, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 322, in text_input
+    return self._text_input(
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 371, in _text_input
+    maybe_raise_label_warnings(label, label_visibility)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\lib\policies.py", line 187, in maybe_raise_label_warnings
+    _LOGGER.warning(
+2026-03-12 13:34:54.251 `label` got an empty value. This is discouraged for accessibility reasons and may be disallowed in the future by raising an exception. Please provide a non-empty label and hide it with label_visibility if needed.
+Stack (most recent call last):
+  File "C:\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+  File "C:\Python314\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 379, in _run_script_thread
+    self._run_script(request.rerun_data)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 705, in _run_script
+    ) = exec_func_with_error_handling(code_to_exec, ctx)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 641, in <module>
+    main()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 619, in main
+    render_login_page()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 381, in render_login_page
+    username = st.text_input("", placeholder="\U0001f464 Username", key="login_user", label_visibility="collapsed")
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\metrics_util.py", line 532, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 322, in text_input
+    return self._text_input(
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 371, in _text_input
+    maybe_raise_label_warnings(label, label_visibility)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\lib\policies.py", line 187, in maybe_raise_label_warnings
+    _LOGGER.warning(
+2026-03-12 13:34:54.253 `label` got an empty value. This is discouraged for accessibility reasons and may be disallowed in the future by raising an exception. Please provide a non-empty label and hide it with label_visibility if needed.
+Stack (most recent call last):
+  File "C:\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+  File "C:\Python314\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 379, in _run_script_thread
+    self._run_script(request.rerun_data)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 705, in _run_script
+    ) = exec_func_with_error_handling(code_to_exec, ctx)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 641, in <module>
+    main()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 619, in main
+    render_login_page()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 385, in render_login_page
+    password = st.text_input("", type="password", placeholder="\U0001f512 Password", key="login_pass", label_visibility="collapsed")
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\metrics_util.py", line 532, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 322, in text_input
+    return self._text_input(
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 371, in _text_input
+    maybe_raise_label_warnings(label, label_visibility)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\lib\policies.py", line 187, in maybe_raise_label_warnings
+    _LOGGER.warning(
+2026-03-12 13:34:54.361 `label` got an empty value. This is discouraged for accessibility reasons and may be disallowed in the future by raising an exception. Please provide a non-empty label and hide it with label_visibility if needed.
+Stack (most recent call last):
+  File "C:\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+  File "C:\Python314\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 379, in _run_script_thread
+    self._run_script(request.rerun_data)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 705, in _run_script
+    ) = exec_func_with_error_handling(code_to_exec, ctx)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 641, in <module>
+    main()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 619, in main
+    render_login_page()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 381, in render_login_page
+    username = st.text_input("", placeholder="\U0001f464 Username", key="login_user", label_visibility="collapsed")
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\metrics_util.py", line 532, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 322, in text_input
+    return self._text_input(
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 371, in _text_input
+    maybe_raise_label_warnings(label, label_visibility)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\lib\policies.py", line 187, in maybe_raise_label_warnings
+    _LOGGER.warning(
+2026-03-12 13:34:54.363 `label` got an empty value. This is discouraged for accessibility reasons and may be disallowed in the future by raising an exception. Please provide a non-empty label and hide it with label_visibility if needed.
+Stack (most recent call last):
+  File "C:\Python314\Lib\threading.py", line 1044, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Python314\Lib\threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+  File "C:\Python314\Lib\threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 379, in _run_script_thread
+    self._run_script(request.rerun_data)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 705, in _run_script
+    ) = exec_func_with_error_handling(code_to_exec, ctx)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 641, in <module>
+    main()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 619, in main
+    render_login_page()
+  File "C:\Users\Thinkpad\Desktop\IHG-POC\knowledge_poc\frontend.py", line 385, in render_login_page
+    password = st.text_input("", type="password", placeholder="\U0001f512 Password", key="login_pass", label_visibility="collapsed")
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\runtime\metrics_util.py", line 532, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 322, in text_input
+    return self._text_input(
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\widgets\text_widgets.py", line 371, in _text_input
+    maybe_raise_label_warnings(label, label_visibility)
+  File "C:\Users\Thinkpad\AppData\Roaming\Python\Python314\site-packages\streamlit\elements\lib\policies.py", line 187, in maybe_raise_label_warnings
+    _LOGGER.warning(
