@@ -156,6 +156,7 @@
 {% endblock %}
 
 {% block extra_js %}
+{{ super() }}
 <script>
     function toggleDetail(docId) {
         const detail = document.getElementById('detail-' + docId);
