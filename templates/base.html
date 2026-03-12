@@ -258,6 +258,22 @@
         }
     </style>
     {% block extra_css %}{% endblock %}
+    <script>
+        // 定义全局logout函数，确保在页面任何位置都可用
+        function logout() {
+            fetch('/api/logout', { 
+                method: 'POST',
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                window.location.href = '/';
+            });
+        }
+    </script>
 </head>
 <body>
     {% if user %}
@@ -291,11 +307,6 @@
     {% endif %}
     
     <script>
-        function logout() {
-            fetch('/api/logout', { method: 'POST' })
-                .then(() => window.location.href = '/');
-        }
-        
         {% block extra_js %}{% endblock %}
     </script>
 </body>
