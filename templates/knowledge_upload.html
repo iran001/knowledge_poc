@@ -109,7 +109,7 @@
 {% endblock %}
 
 {% block content %}
-<h2 class="page-title">🔥 {{ page_title }}</h2>
+<h2 class="page-title">📤 {{ page_title }}</h2>
 
 <!-- 返回链接 -->
 <div class="back-link">
@@ -119,7 +119,7 @@
 <!-- 添加新文件 -->
 <div class="form-section">
     <h3>➕ 添加新文件</h3>
-    <form method="POST" action="/api/hot-knowledge-form">
+    <form method="POST" action="/api/knowledge-upload-form">
         <div class="form-group">
             <label>标题</label>
             <input type="text" name="title" placeholder="输入文件标题" required>

@@ -13,7 +13,7 @@ from config import (
     ROLE_LEVEL_MAP, ROLE_PROMPT_MAP, ROLE_DISPLAY_MAP, DIFY_CONFIG,
     DIFY_ROLE_INPUTS_MAP, RAGFLOW_CONFIG
 )
-from data_store import sessions, hot_knowledge_db
+from data_store import sessions, knowledge_upload_db
 import json
 
 # 创建路由器和模板
@@ -210,9 +210,9 @@ async def documents_page(request: Request):
     })
 
 
-@router.get("/page/hot-knowledge", response_class=HTMLResponse)
-async def hot_knowledge_page(request: Request):
-    """文件管理页面"""
+@router.get("/page/knowledge-upload", response_class=HTMLResponse)
+async def knowledge_upload_page(request: Request):
+    """文件上传页面"""
     from fastapi import HTTPException
     user = get_current_user(request)
     if not user:
@@ -221,12 +221,12 @@ async def hot_knowledge_page(request: Request):
     if user["role"] != "admin":
         raise HTTPException(status_code=403, detail="权限不足")
     
-    return templates.TemplateResponse("hot_knowledge.html", {
+    return templates.TemplateResponse("knowledge_upload.html", {
         "request": request,
         "app_name": APP_INFO["name"],
         "logo": APP_INFO["logo"],
-        "page_title": PAGE_CONFIG["hot_knowledge"]["title"],
+        "page_title": PAGE_CONFIG["knowledge_upload"]["title"],
         "user": user,
-        "active_page": "hot_knowledge",
-        "knowledge_list": hot_knowledge_db
+        "active_page": "knowledge_upload",
+        "knowledge_list": knowledge_upload_db
     })

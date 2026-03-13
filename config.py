@@ -33,6 +33,7 @@ RAGFLOW_CONFIG = {
     "api_key": "ragflow-VhZTNjNWY0ZGIxMjExZjBiMjg3NWE4Yj",
     "dataset_id": "31f6e5b81e1411f18dd4e67a6a3f482a",
     "vl_dataset_id": "9e91232c04e811f18c9e0664f063c4fe",
+    "special_dataset_id": "3c521b90074b11f1826d0664f063c4fe",
     "timeout": 30,
     "page_size": 10  # 每页文档数量
 }
@@ -62,8 +63,8 @@ PAGE_CONFIG = {
     "documents": {
         "title": "文档中心"
     },
-    "hot_knowledge": {
-        "title": "文件管理"
+    "knowledge_upload": {
+        "title": "文件上传"
     }
 }
 
@@ -198,7 +199,7 @@ MOCK_USERS: Dict[str, Dict[str, Any]] = {
 # =============================================================================
 # 模拟文件数据
 # =============================================================================
-MOCK_HOT_KNOWLEDGE: List[Dict[str, Any]] = [
+MOCK_KNOWLEDGE_UPLOAD: List[Dict[str, Any]] = [
     {
         "id": "hot_001",
         "title": "VIP客人入住提醒",

@@ -4,10 +4,10 @@
 """
 
 from typing import Dict, Any, List
-from config import MOCK_HOT_KNOWLEDGE
+from config import MOCK_KNOWLEDGE_UPLOAD
 
 # 会话存储
 sessions: Dict[str, Dict[str, Any]] = {}
 
 # 文件数据
-hot_knowledge_db: List[Dict[str, Any]] = MOCK_HOT_KNOWLEDGE.copy()
+knowledge_upload_db: List[Dict[str, Any]] = MOCK_KNOWLEDGE_UPLOAD.copy()

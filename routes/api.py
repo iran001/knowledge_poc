@@ -18,7 +18,7 @@ from config import (
     RAGFLOW_CONFIG
 )
 from fastapi.templating import Jinja2Templates
-from data_store import sessions, hot_knowledge_db
+from data_store import sessions, knowledge_upload_db
 from chat_history import save_chat_message, load_chat_history, get_user_conversations, delete_chat_history
 
 # 创建路由器和模板
@@ -46,7 +46,7 @@ class DocumentFilterRequest(BaseModel):
     search_keyword: Optional[str] = None
 
 
-class HotKnowledgeRequest(BaseModel):
+class KnowledgeUploadRequest(BaseModel):
     title: str
     content: str
     priority: str = "normal"
@@ -209,6 +209,108 @@ async def api_chat(request: Request, chat_data: ChatRequest):
         }
 
 
+async def _fetch_single_dataset(
+    client: httpx.AsyncClient,
+    base_url: str,
+    dataset_id: str,
+    api_key: str,
+    keyword: str,
+    page: int,
+    page_size: int
+) -> Dict[str, Any]:
+    """
+    从单个 RAGFlow dataset 获取文档列表
+    返回: {"documents": [...], "total": int}
+    """
+    url = f"{base_url}/datasets/{dataset_id}/documents"
+    params = {
+        "page": page,
+        "page_size": page_size,
+        "orderby": "create_time",
+        "desc": "true",
+        "keywords": keyword
+    }
+    headers = {"Authorization": f"Bearer {api_key}"}
+    
+    print(f"[RAGFlow API] Fetching from dataset: {dataset_id}")
+    print(f"[RAGFlow API]   URL: {url}")
+    print(f"[RAGFlow API]   Params: {params}")
+    
+    response = await client.get(url, params=params, headers=headers)
+    
+    if response.status_code != 200:
+        print(f"[RAGFlow API] Error from dataset {dataset_id}: {response.status_code}")
+        return {"documents": [], "total": 0}
+    
+    data = response.json()
+    
+    if data.get("code") != 0:
+        print(f"[RAGFlow API] API Error from dataset {dataset_id}: {data.get('code')}")
+        return {"documents": [], "total": 0}
+    
+    docs_data = data.get("data", {})
+    docs = docs_data.get("docs", [])
+    total = docs_data.get("total", 0)
+    
+    documents = []
+    for doc in docs:
+        documents.append({
+            "id": doc.get("id", ""),
+            "title": doc.get("name", "未命名文档"),
+            "content": doc.get("content", "") or doc.get("description", "暂无描述"),
+            "type": doc.get("type", "未知"),
+            "updated_at": doc.get("update_time", doc.get("create_time", "未知")),
+            "chunk_count": doc.get("chunk_count", 0),
+            "token_count": doc.get("token_count", 0),
+            "progress": doc.get("progress", 0),
+            "progress_msg": doc.get("progress_msg", ""),
+            "run": doc.get("run", ""),
+            "status": doc.get("status", "")
+        })
+    
+    print(f"[RAGFlow API]   Dataset {dataset_id}: {len(documents)} docs, total: {total}")
+    return {"documents": documents, "total": total}
+
+
+async def _fetch_all_documents_from_dataset(
+    client: httpx.AsyncClient,
+    base_url: str,
+    dataset_id: str,
+    api_key: str,
+    keyword: str
+) -> List[Dict[str, Any]]:
+    """
+    从单个 dataset 获取所有文档（处理分页获取全部）
+    """
+    all_docs = []
+    page = 1
+    page_size = 100  # 每次获取较多数据以减少请求次数
+    
+    while True:
+        result = await _fetch_single_dataset(
+            client, base_url, dataset_id, api_key, keyword, page, page_size
+        )
+        
+        docs = result.get("documents", [])
+        if not docs:
+            break
+            
+        all_docs.extend(docs)
+        
+        # 如果返回的数据少于 page_size，说明已经获取完毕
+        if len(docs) < page_size:
+            break
+            
+        page += 1
+        
+        # 安全限制：最多获取 1000 条
+        if len(all_docs) >= 1000:
+            print(f"[RAGFlow API] Reached maximum limit (1000) for dataset {dataset_id}")
+            break
+    
+    return all_docs
+
+
 async def fetch_documents_from_api(
     role: str,
     keyword: str = "",
@@ -217,100 +319,127 @@ async def fetch_documents_from_api(
 ) -> Dict[str, Any]:
     """
     从 RAGFlow API 获取文档列表
+    - admin/manager 角色：从 dataset_id、vl_dataset_id、special_dataset_id 三个 dataset 查询并合并
+    - reception 角色：从 dataset_id、special_dataset_id 两个 dataset 查询并合并
     """
     print("\n" + "=" * 80)
     print("[RAGFlow API] fetch_documents_from_api begin")
     print(f"[RAGFlow API] Input params: role={role}, keyword={keyword}, page={page}, page_size={page_size}")
     
     try:
-        base_url = RAGFLOW_CONFIG["base_url"]
-        dataset_id = RAGFLOW_CONFIG["dataset_id"]
-        api_key = RAGFLOW_CONFIG["api_key"]
+        base_url = str(RAGFLOW_CONFIG["base_url"])
+        dataset_id = str(RAGFLOW_CONFIG["dataset_id"])
+        vl_dataset_id = str(RAGFLOW_CONFIG.get("vl_dataset_id", ""))
+        special_dataset_id = str(RAGFLOW_CONFIG.get("special_dataset_id", ""))
+        api_key = str(RAGFLOW_CONFIG["api_key"])
         
-        print(f"[RAGFlow API] RAGFLOW_CONFIG: base_url={base_url}, dataset_id={dataset_id}")
-       
+        print(f"[RAGFlow API] RAGFLOW_CONFIG: base_url={base_url}, dataset_id={dataset_id}, vl_dataset_id={vl_dataset_id}, special_dataset_id={special_dataset_id}")
         
-        # 构建请求 URL
-        url = f"{base_url}/datasets/{dataset_id}/documents"
-
-        params = {
-            "page": page,
-            "page_size": page_size,
-            "orderby": "create_time",
-            "desc": "true",
-            "keywords": keyword
-        }
-        
-        headers = {
-            "Authorization": f"Bearer {api_key}"
-        }
-        
-        # 记录请求参数
-        print("[RAGFlow API Request]")
-        print(f"  URL: {url}")
-        print(f"  Method: GET")
-        print(f"  Headers: Authorization=Bearer {api_key[:10]}...")
-        print(f"  Params:")
-        for k, v in params.items():
-            print(f"    {k}: {v}")
-        print("-" * 80)
-        
-        async with httpx.AsyncClient(timeout=float(RAGFLOW_CONFIG.get("timeout", 30))) as client:
-            response = await client.get(url, params=params, headers=headers)
+        async with httpx.AsyncClient(timeout=float(RAGFLOW_CONFIG.get("timeout", 60))) as client:
             
-            # 记录响应状态
-            print("[RAGFlow API Response]")
-            print(f"  Status Code: {response.status_code}")
-            print(f"  Content-Type: {response.headers.get('content-type', 'unknown')}")
-            
-            if response.status_code != 200:
-                print(f"[RAGFlow API] Error: {response.status_code}")
-                print(f"[RAGFlow API] Response Text: {response.text[:500]}")
-                return {"documents": [], "total": 0}
-            
-            data = response.json()
-            
-            # 记录完整响应数据
-            data_str = json.dumps(data, ensure_ascii=False, indent=2)
-            print(f"  Response Body: {data_str}")
-            print("-" * 80)
-            
-            if data.get("code") == 0:
-                docs_data = data.get("data", {})
-                docs = docs_data.get("docs", [])
-                total = docs_data.get("total", 0)  # API返回的是 total
+            if role == "reception":
+                # reception 角色：从 dataset_id 和 special_dataset_id 获取数据
+                print(f"[RAGFlow API] Role is 'reception', fetching from dataset_id and special_dataset_id")
                 
-                print(f"[RAGFlow API] Success: Fetched {len(docs)} documents, total: {total}")
+                docs_from_primary = await _fetch_all_documents_from_dataset(
+                    client, base_url, dataset_id, api_key, keyword
+                )
+                docs_from_special = await _fetch_all_documents_from_dataset(
+                    client, base_url, special_dataset_id, api_key, keyword
+                )
                 
-                documents = []
-                for doc in docs:
-                    documents.append({
-                        "id": doc.get("id", ""),
-                        "title": doc.get("name", "未命名文档"),
-                        "content": doc.get("content", "") or doc.get("description", "暂无描述"),
-                        "type": doc.get("type", "未知"),
-                        "updated_at": doc.get("update_time", doc.get("create_time", "未知")),
-                        "permission_level": {"admin": 3, "manager": 2, "reception": 1}.get(role, 1),
-                        "chunk_count": doc.get("chunk_count", 0),
-                        "token_count": doc.get("token_count", 0),
-                        "progress": doc.get("progress", 0),
-                        "progress_msg": doc.get("progress_msg", ""),
-                        "run": doc.get("run", ""),
-                        "status": doc.get("status", "")
-                    })
+                print(f"[RAGFlow API] Primary dataset: {len(docs_from_primary)} docs")
+                print(f"[RAGFlow API] Special dataset: {len(docs_from_special)} docs")
                 
-                return {"documents": documents, "total": total}
+                # 合并数据（按 id 去重）
+                all_documents = {}
+                
+                for doc in docs_from_primary:
+                    doc["permission_level"] = 1
+                    all_documents[doc["id"]] = doc
+                
+                for doc in docs_from_special:
+                    doc["permission_level"] = 1
+                    if doc["id"] not in all_documents:
+                        all_documents[doc["id"]] = doc
+                
+                # 排序和分页
+                merged_docs = list(all_documents.values())
+                merged_docs.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
+                merged_total = len(merged_docs)
+                
+                start_idx = (page - 1) * page_size
+                end_idx = start_idx + page_size
+                paginated_docs = merged_docs[start_idx:end_idx]
+                
+                print(f"[RAGFlow API] Merged: {len(merged_docs)} unique documents")
+                print(f"[RAGFlow API] Paginated: page {page}, showing {len(paginated_docs)} of {merged_total} docs")
+                print("=" * 80 + "\n")
+                
+                return {
+                    "documents": paginated_docs,
+                    "total": merged_total
+                }
+            
             else:
-                print(f"[RAGFlow API] API Error Code: {data.get('code')}, Message: {data.get('message', 'Unknown error')}")
-                return {"documents": [], "total": 0}
+                # admin/manager 角色：从三个 dataset 获取所有数据后合并
+                print(f"[RAGFlow API] Role is '{role}', fetching from all three datasets")
+                
+                docs_from_primary = await _fetch_all_documents_from_dataset(
+                    client, base_url, dataset_id, api_key, keyword
+                )
+                docs_from_vl = await _fetch_all_documents_from_dataset(
+                    client, base_url, vl_dataset_id, api_key, keyword
+                )
+                docs_from_special = await _fetch_all_documents_from_dataset(
+                    client, base_url, special_dataset_id, api_key, keyword
+                )
+                
+                print(f"[RAGFlow API] Primary dataset: {len(docs_from_primary)} docs")
+                print(f"[RAGFlow API] VL dataset: {len(docs_from_vl)} docs")
+                print(f"[RAGFlow API] Special dataset: {len(docs_from_special)} docs")
+                
+                # 合并数据（按 id 去重）
+                all_documents = {}
+                
+                for doc in docs_from_primary:
+                    doc["permission_level"] = {"admin": 3, "manager": 2}.get(role, 2)
+                    all_documents[doc["id"]] = doc
+                
+                for doc in docs_from_vl:
+                    doc["permission_level"] = {"admin": 3, "manager": 2}.get(role, 2)
+                    if doc["id"] not in all_documents:
+                        all_documents[doc["id"]] = doc
+                
+                for doc in docs_from_special:
+                    doc["permission_level"] = {"admin": 3, "manager": 2}.get(role, 2)
+                    if doc["id"] not in all_documents:
+                        all_documents[doc["id"]] = doc
+                
+                # 排序和分页
+                merged_docs = list(all_documents.values())
+                merged_docs.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
+                merged_total = len(merged_docs)
+                
+                start_idx = (page - 1) * page_size
+                end_idx = start_idx + page_size
+                paginated_docs = merged_docs[start_idx:end_idx]
+                
+                print(f"[RAGFlow API] Merged: {len(merged_docs)} unique documents")
+                print(f"[RAGFlow API] Paginated: page {page}, showing {len(paginated_docs)} of {merged_total} docs")
+                print("=" * 80 + "\n")
+                
+                return {
+                    "documents": paginated_docs,
+                    "total": merged_total
+                }
                 
     except Exception as e:
         print(f"[RAGFlow API] Exception: {e}")
         import traceback
         traceback.print_exc()
-        return {"documents": [], "total": 0}
-    finally:
         print("=" * 80 + "\n")
+        return {"documents": [], "total": 0}
 
 
 @router.get("/documents")
@@ -345,8 +474,8 @@ async def api_get_documents(
     }
 
 
-@router.get("/hot-knowledge")
-async def api_get_hot_knowledge(request: Request):
+@router.get("/knowledge-upload")
+async def api_get_knowledge_upload(request: Request):
     """获取文件列表"""
     user = get_current_user(request)
     if not user:
@@ -354,26 +483,26 @@ async def api_get_hot_knowledge(request: Request):
     
     return {
         "success": True,
-        "knowledge": hot_knowledge_db
+        "knowledge": knowledge_upload_db
     }
 
 
-@router.post("/hot-knowledge")
-async def api_add_hot_knowledge(request: Request, data: HotKnowledgeRequest):
+@router.post("/knowledge-upload")
+async def api_add_knowledge_upload(request: Request, data: KnowledgeUploadRequest):
     """添加文件API接口（仅管理员）"""
     user = get_current_user(request)
     if not user or user["role"] != "admin":
         raise HTTPException(status_code=403, detail="权限不足")
     
     new_knowledge = {
-        "id": f"hot_{len(hot_knowledge_db) + 1:03d}",
+        "id": f"ku_{len(knowledge_upload_db) + 1:03d}",
         "title": data.title,
         "content": data.content,
         "priority": data.priority,
         "added_at": datetime.now().strftime("%Y-%m-%d")
     }
     
-    hot_knowledge_db.append(new_knowledge)
+    knowledge_upload_db.append(new_knowledge)
     
     return {
         "success": True,
@@ -382,8 +511,8 @@ async def api_add_hot_knowledge(request: Request, data: HotKnowledgeRequest):
     }
 
 
-@router.post("/hot-knowledge-form")
-async def api_add_hot_knowledge_form(
+@router.post("/knowledge-upload-form")
+async def api_add_knowledge_upload_form(
     request: Request,
     title: str = Form(...),
     content: str = Form(...),
@@ -395,16 +524,16 @@ async def api_add_hot_knowledge_form(
         raise HTTPException(status_code=403, detail="权限不足")
     
     new_knowledge = {
-        "id": f"hot_{len(hot_knowledge_db) + 1:03d}",
+        "id": f"ku_{len(knowledge_upload_db) + 1:03d}",
         "title": title,
         "content": content,
         "priority": priority,
         "added_at": datetime.now().strftime("%Y-%m-%d")
     }
     
-    hot_knowledge_db.append(new_knowledge)
+    knowledge_upload_db.append(new_knowledge)
     
-    return RedirectResponse(url="/page/hot-knowledge", status_code=302)
+    return RedirectResponse(url="/page/knowledge-upload", status_code=302)
 
 
 # =============================================================================
