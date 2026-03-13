@@ -91,7 +91,6 @@ async def index(request: Request):
 @router.get("/page/chat", response_class=HTMLResponse)
 async def chat_page(request: Request):
     """智能对话页面"""
-    from config import DIFY_CONFIG
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/")
@@ -101,7 +100,6 @@ async def chat_page(request: Request):
         "app_name": APP_INFO["name"],
         "logo": APP_INFO["logo"],
         "page_title": PAGE_CONFIG["chat"]["title"],
-        "dify_chatbot_url": DIFY_CONFIG["chatbot_url"],
         "user": user,
         "active_page": "chat"
     })

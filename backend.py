@@ -52,10 +52,10 @@ if __name__ == "__main__":
     print(f"  • API文档:   http://{SERVER_CONFIG['host']}:{SERVER_CONFIG['backend_port']}/docs")
     print(f"  • ReDoc:     http://{SERVER_CONFIG['host']}:{SERVER_CONFIG['backend_port']}/redoc")
     print("=" * 60)
-    
+
     uvicorn.run(
         "backend:app",
-        host=SERVER_CONFIG["host"],
-        port=SERVER_CONFIG["backend_port"],
-        reload=SERVER_CONFIG["reload"]
+        host=str(SERVER_CONFIG["host"]),
+        port=int(SERVER_CONFIG["backend_port"]),
+        reload=bool(SERVER_CONFIG["reload"])
     )

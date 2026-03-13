@@ -88,14 +88,75 @@ ROLE_PROMPT_MAP = {
     "admin": """你是IHG酒店的系统管理员助手，拥有最高权限。
 你可以访问所有文档和数据，包括财务信息、人事档案、系统配置等敏感内容。
 请以专业、高效的方式回答管理员的问题。""",
-    
+
     "manager": """你是IHG酒店的客服经理助手，拥有标准权限。
 你可以访问标准操作文档、案例分析、客户反馈等资料。
 请帮助经理处理客户投诉、分析服务问题、提供改进建议。""",
-    
+
     "reception": """你是IHG酒店的前台助手，拥有基础权限。
 你只能访问公开的操作手册、常见问题解答、酒店设施介绍等基础文档。
 请友好地回答客人的咨询问题，帮助他们办理入住、了解酒店服务。"""
+}
+
+# =============================================================================
+# Dify Chatbot Embed 配置（角色相关）
+# =============================================================================
+
+# Dify Chatbot 基础配置
+DIFY_CHATBOT_CONFIG = {
+    "base_url": "http://116.62.30.61",
+    "token": "RgIwnnnxUrynbPCN"
+}
+
+# 角色对应的输入变量（传递给 Dify 工作流）
+DIFY_ROLE_INPUTS_MAP: Dict[str, Dict[str, str]] = {
+    "admin": {
+        "role": "admin",
+        "role_name": "系统管理员",
+        "access_level": "high"
+    },
+    "manager": {
+        "role": "manager",
+        "role_name": "客服经理",
+        "access_level": "medium"
+    },
+    "reception": {
+        "role": "reception",
+        "role_name": "前台接待",
+        "access_level": "low"
+    }
+}
+
+# 角色对应的系统变量（Dify 系统级配置）
+DIFY_ROLE_SYSTEM_VARS_MAP: Dict[str, Dict[str, str]] = {
+    "admin": {
+        "user_type": "administrator",
+        "permissions": "full_access"
+    },
+    "manager": {
+        "user_type": "manager",
+        "permissions": "standard_access"
+    },
+    "reception": {
+        "user_type": "front_desk",
+        "permissions": "limited_access"
+    }
+}
+
+# 角色对应的用户变量（用户头像和显示名称）
+DIFY_ROLE_USER_VARS_MAP: Dict[str, Dict[str, str]] = {
+    "admin": {
+        "avatar_url": "https://cdn-icons-png.flaticon.com/512/295/295128.png",
+        "name": "系统管理员"
+    },
+    "manager": {
+        "avatar_url": "https://cdn-icons-png.flaticon.com/512/295/295117.png",
+        "name": "客服经理"
+    },
+    "reception": {
+        "avatar_url": "https://cdn-icons-png.flaticon.com/512/295/295105.png",
+        "name": "前台接待"
+    }
 }
 
 # =============================================================================
@@ -247,5 +308,3 @@ except ImportError:
 # 自动检测后端地址（支持同站点部署和独立部署）
 API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
 
-# Dify 聊天机器人URL
-DIFY_CHATBOT_URL = "http://116.62.30.61/chatbot/RgIwnnnxUrynbPCN"
