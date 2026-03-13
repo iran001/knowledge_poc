@@ -496,7 +496,7 @@
     }
 
     // 调用 Dify API (流式响应)
-    async function callDifyAPI(userMessage, typingId) {
+    async function callDifyAPI(userMessageContent, typingId) {
         // 重置状态
         thinkContent = '';
         answerContent = '';
@@ -511,7 +511,7 @@
             },
             body: JSON.stringify({
                 inputs: ROLE_INPUTS,
-                query: userMessage,
+                query: userMessageContent,
                 response_mode: 'streaming',
                 conversation_id: conversationId,
                 user: USER_ID,
@@ -550,38 +550,69 @@
                         switch (data.event) {
                             case 'workflow_started':
                                 // 工作流开始
+                                console.log('[Workflow] Started');
                                 break;
 
                             case 'message':
-                                // 收到消息片段
+                            case 'agent_message':
+                                // 收到消息片段 - Dify 可能返回 data.answer 或 data.data.text
+                                let messageContent = '';
                                 if (data.answer) {
-                                    buffer += data.answer;
+                                    messageContent = data.answer;
+                                } else if (data.data && data.data.text) {
+                                    messageContent = data.data.text;
+                                } else if (data.data && typeof data.data === 'string') {
+                                    messageContent = data.data;
+                                } else if (data.data && data.data.answer) {
+                                    messageContent = data.data.answer;
+                                } else if (data.data && data.data.content) {
+                                    messageContent = data.data.content;
+                                }
+
+                                if (messageContent) {
+                                    buffer += messageContent;
+                                    console.log('[Buffer] Updated, length:', buffer.length);
 
                                     // 实时解析并更新显示
                                     const parsed = parseContent(buffer);
                                     updateBotMessage(currentBotMessageId, parsed.thinks, parsed.answer);
+                                }
 
-                                    // 保存返回的 conversation_id
-                                    if (data.conversation_id) {
-                                        saveConversationId(data.conversation_id);
-                                    }
+                                // 保存返回的 conversation_id（每个消息事件都可能包含）
+                                if (data.conversation_id) {
+                                    saveConversationId(data.conversation_id);
                                 }
                                 break;
 
                             case 'message_end':
                                 // 消息结束，最终解析
+                                console.log('[Message End] Buffer length:', buffer.length, 'Content preview:', buffer.substring(0, 100));
                                 const finalParsed = parseContent(buffer);
                                 updateBotMessage(currentBotMessageId, finalParsed.thinks, finalParsed.answer);
                                 isTyping = false;
 
                                 // 保存消息到后端（先用户消息，后bot消息）
-                                if (conversationId) {
+                                // 优先使用 data.conversation_id，其次是全局的 conversationId
+                                const finalConversationId = data.conversation_id || conversationId;
+                                console.log('[Save] finalConversationId:', finalConversationId, 'buffer empty:', !buffer);
+                                if (finalConversationId) {
+                                    // 更新全局 conversationId（首次会话时）
+                                    if (data.conversation_id && !conversationId) {
+                                        saveConversationId(data.conversation_id);
+                                    }
                                     const fullContent = buffer;
                                     const thinkText = finalParsed.thinks.join('\n\n');
                                     // 先保存用户提问
-                                    await saveMessageToBackend(conversationId, 'user', userMessage);
-                                    // 再保存bot回复
-                                    await saveMessageToBackend(conversationId, 'bot', fullContent, thinkText);
+                                    await saveMessageToBackend(finalConversationId, 'user', userMessageContent);
+                                    // 再保存bot回复（确保有内容才保存）
+                                    if (fullContent || thinkText) {
+                                        await saveMessageToBackend(finalConversationId, 'bot', fullContent, thinkText);
+                                        console.log('[Save] Bot message saved, length:', fullContent.length);
+                                    } else {
+                                        console.warn('[Save] Bot message content is empty, skipping save');
+                                    }
+                                } else {
+                                    console.warn('[Save] No conversation_id available, message not saved');
                                 }
                                 break;
 
