@@ -9,9 +9,11 @@ from typing import Optional, Dict, Any
 
 from config import (
     APP_INFO, PAGE_CONFIG, TEMPLATE_DIR, MOCK_DOCUMENTS,
-    ROLE_LEVEL_MAP
+    ROLE_LEVEL_MAP, ROLE_PROMPT_MAP, DIFY_CONFIG,
+    DIFY_ROLE_INPUTS_MAP
 )
 from data_store import sessions, hot_knowledge_db
+import json
 
 # 创建路由器和模板
 router = APIRouter()
@@ -94,14 +96,34 @@ async def chat_page(request: Request):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/")
-    
+
+    # 获取用户角色相关的 Dify 配置
+    user_role = user.get("role", "reception")
+    display_name = user.get("display_name", "访客")
+
+    # 根据角色获取系统提示词和输入变量
+    system_prompt = ROLE_PROMPT_MAP.get(user_role, ROLE_PROMPT_MAP["reception"])
+    role_inputs = DIFY_ROLE_INPUTS_MAP.get(user_role, DIFY_ROLE_INPUTS_MAP["reception"])
+
+    # 打印配置信息到控制台
+    print("=" * 60)
+    print(f"[Dify Chatbot Config] User: {display_name} (Role: {user_role})")
+    print(f"[Dify Chatbot Config] system_prompt: {system_prompt}")
+    print(f"[Dify Chatbot Config] role_inputs: {json.dumps(role_inputs, ensure_ascii=False)}")
+    print("=" * 60)
+
     return templates.TemplateResponse("chat.html", {
         "request": request,
         "app_name": APP_INFO["name"],
         "logo": APP_INFO["logo"],
         "page_title": PAGE_CONFIG["chat"]["title"],
         "user": user,
-        "active_page": "chat"
+        "active_page": "chat",
+        # Dify API 配置
+        "dify_config": DIFY_CONFIG,
+        "role_inputs": json.dumps(role_inputs, ensure_ascii=False),
+        "system_prompt": system_prompt,
+        "user_role": user_role
     })
 
 

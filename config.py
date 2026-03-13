@@ -20,7 +20,8 @@ SERVER_CONFIG = {
 # =============================================================================
 DIFY_CONFIG = {
     "base_url": "http://116.62.30.61/v1",
-    "chatbot_url": "http://116.62.30.61/chatbot/RgIwnnnxUrynbPCN",
+    "api_key": "app-eMP8p1e8UcjxdNBZymXc0LdX",
+    "chat_messages_endpoint": "/chat-messages",
     "timeout": 30
 }
 
@@ -105,7 +106,8 @@ ROLE_PROMPT_MAP = {
 # Dify Chatbot 基础配置
 DIFY_CHATBOT_CONFIG = {
     "base_url": "http://116.62.30.61",
-    "token": "RgIwnnnxUrynbPCN"
+    "token": "RgIwnnnxUrynbPCN",
+    "app_secret": "app-eMP8p1e8UcjxdNBZymXc0LdX"
 }
 
 # 角色对应的输入变量（传递给 Dify 工作流）
