@@ -17,6 +17,7 @@ from config import (
 )
 from fastapi.templating import Jinja2Templates
 from data_store import sessions, hot_knowledge_db
+from chat_history import save_chat_message, load_chat_history, get_user_conversations, delete_chat_history
 
 # 创建路由器和模板
 router = APIRouter(prefix="/api")
@@ -47,6 +48,18 @@ class HotKnowledgeRequest(BaseModel):
     title: str
     content: str
     priority: str = "normal"
+
+
+class SaveMessageRequest(BaseModel):
+    conversation_id: str
+    role: str
+    content: str
+    think_content: str = ""
+
+
+class ChatHistoryResponse(BaseModel):
+    conversation_id: str
+    history: List[Dict[str, Any]]
 
 
 # =============================================================================
@@ -282,3 +295,93 @@ async def api_add_hot_knowledge_form(
     hot_knowledge_db.append(new_knowledge)
     
     return RedirectResponse(url="/page/hot-knowledge", status_code=302)
+
+
+# =============================================================================
+# 对话历史 API
+# =============================================================================
+
+@router.post("/chat-history/save")
+async def api_save_chat_message(request: Request, data: SaveMessageRequest):
+    """保存对话消息"""
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="未登录")
+    
+    metadata = {
+        "user_id": user.get("username"),
+        "user_role": user.get("role"),
+        "user_display_name": user.get("display_name")
+    }
+    
+    success = save_chat_message(
+        conversation_id=data.conversation_id,
+        role=data.role,
+        content=data.content,
+        think_content=data.think_content,
+        metadata=metadata
+    )
+    
+    return {
+        "success": success,
+        "conversation_id": data.conversation_id
+    }
+
+
+@router.get("/chat-history/{conversation_id}")
+async def api_get_chat_history(request: Request, conversation_id: str):
+    """获取对话历史"""
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="未登录")
+    
+    history = load_chat_history(conversation_id)
+    
+    # 过滤出当前用户的消息
+    user_history = [
+        msg for msg in history 
+        if msg.get("metadata", {}).get("user_id") == user.get("username")
+    ]
+    
+    return {
+        "success": True,
+        "conversation_id": conversation_id,
+        "history": user_history
+    }
+
+
+@router.get("/chat-history")
+async def api_get_user_conversations(request: Request):
+    """获取用户的所有会话列表"""
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="未登录")
+    
+    conversations = get_user_conversations(user.get("username"))
+    
+    return {
+        "success": True,
+        "conversations": conversations
+    }
+
+
+@router.delete("/chat-history/{conversation_id}")
+async def api_delete_chat_history(request: Request, conversation_id: str):
+    """删除对话历史"""
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="未登录")
+    
+    # 检查是否是该用户的对话
+    history = load_chat_history(conversation_id)
+    user_messages = [m for m in history if m.get("metadata", {}).get("user_id") == user.get("username")]
+    
+    if not user_messages:
+        raise HTTPException(status_code=403, detail="无权删除此对话")
+    
+    success = delete_chat_history(conversation_id)
+    
+    return {
+        "success": success,
+        "conversation_id": conversation_id
+    }

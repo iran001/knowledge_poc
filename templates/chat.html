@@ -244,16 +244,111 @@
         margin-bottom: 16px;
         color: #111827;
     }
+
+    /* Think 内容样式 */
+    .think-content {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #92400e;
+    }
+
+    .think-content .think-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .think-content .think-label::before {
+        content: "💭";
+    }
+
+    .think-content pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: inherit;
+        line-height: 1.5;
+    }
+
+    /* 最终答案样式 */
+    .answer-content {
+        background: #f0fdf4;
+        border-left: 4px solid #22c55e;
+        padding: 12px 16px;
+        border-radius: 8px;
+    }
+
+    .answer-content .answer-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #166534;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .answer-content .answer-label::before {
+        content: "✅";
+    }
+
+    .answer-content pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: inherit;
+        line-height: 1.6;
+        color: #374151;
+    }
+
+    /* 新对话按钮 */
+    .new-chat-btn {
+        padding: 6px 12px;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .new-chat-btn:hover {
+        background: #e5e7eb;
+        border-color: #d1d5db;
+    }
+
+    .conversation-info {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-left: 10px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="chat-wrapper">
     <div class="chat-header">
-        <h2>💬 {{ page_title }}</h2>
-        <div class="powered-by">
-            POWERED BY
-            <img src="https://img.shields.io/badge/Dify-1C64F2?style=flat-square&labelColor=white&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJTMiAyMiA2LjQ4IDIyIDEyIDIyIDEyIDEyIDYuNDggMiAxMiAyWiIgZmlsbD0iIzFDNjRGMiIvPjwvc3ZnPg==" alt="Dify">
+        <div style="display: flex; align-items: center;">
+            <h2>💬 {{ page_title }}</h2>
+            <span class="conversation-info" id="conversationInfo"></span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button class="new-chat-btn" onclick="startNewChat()" title="开始新对话">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                新对话
+            </button>
         </div>
     </div>
 
@@ -306,8 +401,32 @@
 
     // 用户标识
     const USER_ID = '{{ user.username }}';
-    let conversationId = '';
+    const USER_ROLE = '{{ user_role }}';
+
+    // 从 localStorage 获取保存的 conversation_id，如果没有则为空
+    const STORAGE_KEY = 'dify_conversation_id_' + USER_ID;
+    let conversationId = localStorage.getItem(STORAGE_KEY) || '';
     let isTyping = false;
+    let currentBotMessageId = null;
+    let thinkContent = '';
+    let answerContent = '';
+    let isInThinkTag = false;
+
+    // 保存 conversation_id 到 localStorage
+    function saveConversationId(id) {
+        if (id) {
+            conversationId = id;
+            localStorage.setItem(STORAGE_KEY, id);
+            console.log('[Conversation] Saved conversation_id:', id);
+        }
+    }
+
+    // 清除 conversation_id（用于开始新对话）
+    function clearConversationId() {
+        conversationId = '';
+        localStorage.removeItem(STORAGE_KEY);
+        console.log('[Conversation] Cleared conversation_id');
+    }
 
     // 发送预设问题
     function sendQuestion(question) {
@@ -345,7 +464,7 @@
         const typingId = showTypingIndicator();
 
         try {
-            // 调用 Dify API
+            // 调用 Dify API，传递用户消息用于后续保存
             await callDifyAPI(message, typingId);
         } catch (error) {
             console.error('API Error:', error);
@@ -355,8 +474,35 @@
         }
     }
 
+    // 解析内容，分离 think 标签和答案
+    function parseContent(text) {
+        const thinkRegex = /<think>([\s\S]*?)<\/think>/g;
+        const thinks = [];
+        let match;
+        let lastIndex = 0;
+
+        while ((match = thinkRegex.exec(text)) !== null) {
+            thinks.push(match[1].trim());
+            lastIndex = thinkRegex.lastIndex;
+        }
+
+        // 提取答案（think标签之后的内容）
+        const answer = text.substring(lastIndex).trim();
+
+        return {
+            thinks: thinks,
+            answer: answer
+        };
+    }
+
     // 调用 Dify API (流式响应)
-    async function callDifyAPI(message, typingId) {
+    async function callDifyAPI(userMessage, typingId) {
+        // 重置状态
+        thinkContent = '';
+        answerContent = '';
+        isInThinkTag = false;
+        currentBotMessageId = null;
+
         const response = await fetch(DIFY_CONFIG.baseUrl + DIFY_CONFIG.endpoint, {
             method: 'POST',
             headers: {
@@ -365,7 +511,7 @@
             },
             body: JSON.stringify({
                 inputs: ROLE_INPUTS,
-                query: message,
+                query: userMessage,
                 response_mode: 'streaming',
                 conversation_id: conversationId,
                 user: USER_ID,
@@ -380,11 +526,13 @@
         // 移除输入中状态
         removeTypingIndicator(typingId);
 
+        // 创建机器人消息容器
+        currentBotMessageId = addMessage('bot', '', true);
+
         // 处理流式响应
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let botMessageId = null;
-        let botMessageContent = '';
+        let buffer = '';
 
         while (true) {
             const { done, value } = await reader.read();
@@ -407,22 +555,34 @@
                             case 'message':
                                 // 收到消息片段
                                 if (data.answer) {
-                                    if (!botMessageId) {
-                                        botMessageId = addMessage('bot', '');
-                                    }
-                                    botMessageContent += data.answer;
-                                    updateMessage(botMessageId, botMessageContent);
+                                    buffer += data.answer;
 
-                                    // 更新会话ID
+                                    // 实时解析并更新显示
+                                    const parsed = parseContent(buffer);
+                                    updateBotMessage(currentBotMessageId, parsed.thinks, parsed.answer);
+
+                                    // 保存返回的 conversation_id
                                     if (data.conversation_id) {
-                                        conversationId = data.conversation_id;
+                                        saveConversationId(data.conversation_id);
                                     }
                                 }
                                 break;
 
                             case 'message_end':
-                                // 消息结束
+                                // 消息结束，最终解析
+                                const finalParsed = parseContent(buffer);
+                                updateBotMessage(currentBotMessageId, finalParsed.thinks, finalParsed.answer);
                                 isTyping = false;
+
+                                // 保存消息到后端（先用户消息，后bot消息）
+                                if (conversationId) {
+                                    const fullContent = buffer;
+                                    const thinkText = finalParsed.thinks.join('\n\n');
+                                    // 先保存用户提问
+                                    await saveMessageToBackend(conversationId, 'user', userMessage);
+                                    // 再保存bot回复
+                                    await saveMessageToBackend(conversationId, 'bot', fullContent, thinkText);
+                                }
                                 break;
 
                             case 'workflow_finished':
@@ -433,8 +593,8 @@
                             case 'error':
                                 // 错误
                                 console.error('[Dify Error]', data);
-                                if (botMessageId) {
-                                    updateMessage(botMessageId, '抱歉，处理请求时发生错误。');
+                                if (currentBotMessageId) {
+                                    updateBotMessage(currentBotMessageId, [], '抱歉，处理请求时发生错误。');
                                 }
                                 isTyping = false;
                                 break;
@@ -447,19 +607,34 @@
         }
 
         isTyping = false;
+        currentBotMessageId = null;
     }
 
     // 添加消息到界面
-    function addMessage(type, content) {
+    function addMessage(type, content, isStructured = false) {
         const messagesContainer = document.getElementById('chatMessages');
         const messageId = 'msg-' + Date.now();
+
+        let contentHtml;
+        if (type === 'bot' && isStructured) {
+            // 结构化消息（支持 think 和 answer 分层）
+            contentHtml = `
+                <div class="message-content-structured" id="${messageId}-content">
+                    <!-- think 内容将在这里显示 -->
+                    <!-- answer 内容将在这里显示 -->
+                </div>
+            `;
+        } else {
+            // 普通消息
+            contentHtml = `<div class="message-content">${escapeHtml(content)}</div>`;
+        }
 
         const messageHtml = `
             <div class="message ${type}" id="${messageId}">
                 <div class="message-avatar">
                     ${type === 'bot' ? '🤖' : '👤'}
                 </div>
-                <div class="message-content">${escapeHtml(content)}</div>
+                ${contentHtml}
             </div>
         `;
 
@@ -469,13 +644,47 @@
         return messageId;
     }
 
-    // 更新消息内容
+    // 更新机器人消息（分层显示 think 和 answer）
+    function updateBotMessage(messageId, thinks, answer) {
+        const contentEl = document.getElementById(messageId + '-content');
+        if (!contentEl) return;
+
+        let html = '';
+
+        // 显示 think 内容
+        if (thinks && thinks.length > 0) {
+            const thinkText = thinks.join('\n\n');
+            html += `
+                <div class="think-content">
+                    <div class="think-label">思考过程</div>
+                    <pre>${escapeHtml(thinkText)}</pre>
+                </div>
+            `;
+        }
+
+        // 显示答案内容
+        if (answer) {
+            html += `
+                <div class="answer-content">
+                    <div class="answer-label">回答</div>
+                    <pre>${escapeHtml(answer)}</pre>
+                </div>
+            `;
+        }
+
+        contentEl.innerHTML = html;
+        scrollToBottom();
+    }
+
+    // 更新普通消息内容（兼容旧代码）
     function updateMessage(messageId, content) {
         const messageEl = document.getElementById(messageId);
         if (messageEl) {
             const contentEl = messageEl.querySelector('.message-content');
-            contentEl.innerHTML = escapeHtml(content);
-            scrollToBottom();
+            if (contentEl) {
+                contentEl.innerHTML = escapeHtml(content);
+                scrollToBottom();
+            }
         }
     }
 
@@ -522,9 +731,130 @@
         return div.innerHTML;
     }
 
-    // 页面加载完成后聚焦输入框
-    document.addEventListener('DOMContentLoaded', function() {
+    // 开始新对话
+    function startNewChat() {
+        // 清除 conversation_id
+        clearConversationId();
+
+        // 清空消息列表
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.innerHTML = `
+            <div class="welcome-message" id="welcomeMessage">
+                <h3>👋 您好！我是 IHG Pedia</h3>
+                <p>有什么可以帮到你的吗？请告诉我你的问题，我可以进行问题回答。</p>
+                <div class="suggested-questions">
+                    <span class="suggested-question" onclick="sendQuestion('会员招募流程')">会员招募流程</span>
+                    <span class="suggested-question" onclick="sendQuestion('会员转化率')">会员转化率</span>
+                    <span class="suggested-question" onclick="sendQuestion('介绍企微管家')">介绍企微管家</span>
+                    <span class="suggested-question" onclick="sendQuestion('IHG直销渠道支付宝支付优化方案')">IHG直销渠道支付宝支付优化方案</span>
+                </div>
+            </div>
+        `;
+
+        // 更新会话信息显示
+        updateConversationInfo();
+
+        // 聚焦输入框
         document.getElementById('chatInput').focus();
+    }
+
+    // 更新会话信息显示
+    function updateConversationInfo() {
+        const infoEl = document.getElementById('conversationInfo');
+        if (infoEl) {
+            if (conversationId) {
+                infoEl.textContent = `(会话: ${conversationId.substring(0, 8)}...)`;
+                infoEl.title = `当前会话ID: ${conversationId}`;
+            } else {
+                infoEl.textContent = '(新会话)';
+                infoEl.title = '新会话，对话将创建新的 conversation_id';
+            }
+        }
+    }
+
+    // 加载历史对话
+    async function loadChatHistory() {
+        if (!conversationId) {
+            console.log('[History] No conversation_id, skip loading');
+            return;
+        }
+
+        try {
+            console.log('[History] Loading history for:', conversationId);
+            const response = await fetch(`/api/chat-history/${conversationId}`, {
+                method: 'GET',
+                credentials: 'same-origin'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.success && data.history && data.history.length > 0) {
+                console.log('[History] Loaded', data.history.length, 'messages');
+
+                // 隐藏欢迎消息
+                const welcomeMsg = document.getElementById('welcomeMessage');
+                if (welcomeMsg) {
+                    welcomeMsg.style.display = 'none';
+                }
+
+                // 渲染历史消息
+                for (const msg of data.history) {
+                    if (msg.role === 'user') {
+                        addMessage('user', msg.content);
+                    } else if (msg.role === 'bot') {
+                        // 解析 think 和 answer
+                        const parsed = parseContent(msg.content);
+                        const botMsgId = addMessage('bot', '', true);
+                        updateBotMessage(botMsgId, parsed.thinks, parsed.answer);
+                    }
+                }
+
+                // 滚动到底部
+                scrollToBottom();
+            }
+        } catch (error) {
+            console.error('[History] Error loading history:', error);
+        }
+    }
+
+    // 保存消息到后端
+    async function saveMessageToBackend(conversationId, role, content, thinkContent = '') {
+        try {
+            const response = await fetch('/api/chat-history/save', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    conversation_id: conversationId,
+                    role: role,
+                    content: content,
+                    think_content: thinkContent
+                })
+            });
+
+            if (!response.ok) {
+                console.error('[Save] Failed to save message:', response.status);
+            } else {
+                console.log('[Save] Message saved successfully');
+            }
+        } catch (error) {
+            console.error('[Save] Error saving message:', error);
+        }
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', async function() {
+        document.getElementById('chatInput').focus();
+        updateConversationInfo();
+        console.log('[Conversation] Current conversation_id:', conversationId || '(empty - new chat)');
+
+        // 加载历史对话
+        await loadChatHistory();
     });
 </script>
 {% endblock %}
