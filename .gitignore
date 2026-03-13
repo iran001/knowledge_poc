@@ -82,3 +82,4 @@ htmlcov/
 streamlit.log
 __pycache__/backend.cpython-314.pyc
 __pycache__/config.cpython-314.pyc
+backend.log
