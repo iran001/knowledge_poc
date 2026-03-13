@@ -9,11 +9,13 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 import uuid
 import httpx
+import json
 
 from config import (
     SERVER_CONFIG, DIFY_CONFIG,
     ROLE_DISPLAY_MAP, ROLE_LEVEL_MAP, ROLE_PROMPT_MAP,
-    MOCK_USERS, APP_INFO, PAGE_CONFIG, TEMPLATE_DIR
+    MOCK_USERS, APP_INFO, PAGE_CONFIG, TEMPLATE_DIR,
+    RAGFLOW_CONFIG
 )
 from fastapi.templating import Jinja2Templates
 from data_store import sessions, hot_knowledge_db
@@ -207,37 +209,145 @@ async def api_chat(request: Request, chat_data: ChatRequest):
         }
 
 
-@router.post("/documents")
-async def api_documents(request: Request, filter_data: DocumentFilterRequest):
-    """获取文档列表接口"""
-    from config import MOCK_DOCUMENTS
-    user_level = get_user_role_level(filter_data.role)
+async def fetch_documents_from_api(
+    role: str,
+    keyword: str = "",
+    page: int = 1,
+    page_size: int = 10
+) -> Dict[str, Any]:
+    """
+    从 RAGFlow API 获取文档列表
+    """
+    print("\n" + "=" * 80)
+    print("[RAGFlow API] fetch_documents_from_api begin")
+    print(f"[RAGFlow API] Input params: role={role}, keyword={keyword}, page={page}, page_size={page_size}")
     
-    documents = [
-        doc for doc in MOCK_DOCUMENTS
-        if doc["permission_level"] <= user_level
-    ]
+    try:
+        base_url = RAGFLOW_CONFIG["base_url"]
+        dataset_id = RAGFLOW_CONFIG["dataset_id"]
+        api_key = RAGFLOW_CONFIG["api_key"]
+        
+        print(f"[RAGFlow API] RAGFLOW_CONFIG: base_url={base_url}, dataset_id={dataset_id}")
+       
+        
+        # 构建请求 URL
+        url = f"{base_url}/datasets/{dataset_id}/documents"
+
+        params = {
+            "page": page,
+            "page_size": page_size,
+            "orderby": "create_time",
+            "desc": "true",
+            "keywords": keyword
+        }
+        
+        headers = {
+            "Authorization": f"Bearer {api_key}"
+        }
+        
+        # 记录请求参数
+        print("[RAGFlow API Request]")
+        print(f"  URL: {url}")
+        print(f"  Method: GET")
+        print(f"  Headers: Authorization=Bearer {api_key[:10]}...")
+        print(f"  Params:")
+        for k, v in params.items():
+            print(f"    {k}: {v}")
+        print("-" * 80)
+        
+        async with httpx.AsyncClient(timeout=float(RAGFLOW_CONFIG.get("timeout", 30))) as client:
+            response = await client.get(url, params=params, headers=headers)
+            
+            # 记录响应状态
+            print("[RAGFlow API Response]")
+            print(f"  Status Code: {response.status_code}")
+            print(f"  Content-Type: {response.headers.get('content-type', 'unknown')}")
+            
+            if response.status_code != 200:
+                print(f"[RAGFlow API] Error: {response.status_code}")
+                print(f"[RAGFlow API] Response Text: {response.text[:500]}")
+                return {"documents": [], "total": 0}
+            
+            data = response.json()
+            
+            # 记录完整响应数据
+            data_str = json.dumps(data, ensure_ascii=False, indent=2)
+            print(f"  Response Body: {data_str}")
+            print("-" * 80)
+            
+            if data.get("code") == 0:
+                docs_data = data.get("data", {})
+                docs = docs_data.get("docs", [])
+                total = docs_data.get("total", 0)  # API返回的是 total
+                
+                print(f"[RAGFlow API] Success: Fetched {len(docs)} documents, total: {total}")
+                
+                documents = []
+                for doc in docs:
+                    documents.append({
+                        "id": doc.get("id", ""),
+                        "title": doc.get("name", "未命名文档"),
+                        "content": doc.get("content", "") or doc.get("description", "暂无描述"),
+                        "type": doc.get("type", "未知"),
+                        "updated_at": doc.get("update_time", doc.get("create_time", "未知")),
+                        "permission_level": {"admin": 3, "manager": 2, "reception": 1}.get(role, 1),
+                        "chunk_count": doc.get("chunk_count", 0),
+                        "token_count": doc.get("token_count", 0),
+                        "progress": doc.get("progress", 0),
+                        "progress_msg": doc.get("progress_msg", ""),
+                        "run": doc.get("run", ""),
+                        "status": doc.get("status", "")
+                    })
+                
+                return {"documents": documents, "total": total}
+            else:
+                print(f"[RAGFlow API] API Error Code: {data.get('code')}, Message: {data.get('message', 'Unknown error')}")
+                return {"documents": [], "total": 0}
+                
+    except Exception as e:
+        print(f"[RAGFlow API] Exception: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"documents": [], "total": 0}
+    finally:
+        print("=" * 80 + "\n")
+
+
+@router.get("/documents")
+async def api_get_documents(
+    request: Request,
+    keyword: str = "",
+    page: int = 1,
+    page_size: int = 10
+):
+    """获取文档列表接口 (GET) - 供前端 AJAX 调用"""
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="未登录")
     
-    if filter_data.search_keyword:
-        keyword = filter_data.search_keyword.lower()
-        documents = [
-            doc for doc in documents
-            if keyword in doc["title"].lower() or keyword in doc["content"].lower()
-        ]
+    result = await fetch_documents_from_api(
+        role=user["role"],
+        keyword=keyword,
+        page=page,
+        page_size=page_size
+    )
     
     return {
         "success": True,
-        "role": filter_data.role,
-        "role_display": ROLE_DISPLAY_MAP.get(filter_data.role, {}).get("name", "未知"),
-        "total_count": len(documents),
-        "visible_permission": f"级别 {user_level} 及以下",
-        "documents": documents
+        "role": user["role"],
+        "role_display": ROLE_DISPLAY_MAP.get(user["role"], {}).get("name", "未知"),
+        "total_count": result["total"],
+        "current_page": page,
+        "total_pages": (result["total"] + page_size - 1) // page_size if result["total"] > 0 else 1,
+        "page_size": page_size,
+        "visible_permission": ROLE_DISPLAY_MAP.get(user["role"], {}).get("name", "未知"),
+        "documents": result["documents"]
     }
 
 
 @router.get("/hot-knowledge")
 async def api_get_hot_knowledge(request: Request):
-    """获取热知识列表"""
+    """获取文件列表"""
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="未登录")
@@ -250,7 +360,7 @@ async def api_get_hot_knowledge(request: Request):
 
 @router.post("/hot-knowledge")
 async def api_add_hot_knowledge(request: Request, data: HotKnowledgeRequest):
-    """添加热知识API接口（仅管理员）"""
+    """添加文件API接口（仅管理员）"""
     user = get_current_user(request)
     if not user or user["role"] != "admin":
         raise HTTPException(status_code=403, detail="权限不足")
@@ -267,7 +377,7 @@ async def api_add_hot_knowledge(request: Request, data: HotKnowledgeRequest):
     
     return {
         "success": True,
-        "message": "热知识添加成功",
+        "message": "文件添加成功",
         "knowledge": new_knowledge
     }
 
@@ -279,7 +389,7 @@ async def api_add_hot_knowledge_form(
     content: str = Form(...),
     priority: str = Form("normal")
 ):
-    """添加热知识表单接口（仅管理员）"""
+    """添加文件表单接口（仅管理员）"""
     user = get_current_user(request)
     if not user or user["role"] != "admin":
         raise HTTPException(status_code=403, detail="权限不足")

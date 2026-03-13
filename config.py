@@ -29,9 +29,12 @@ DIFY_CONFIG = {
 # RAGFlow API 配置
 # =============================================================================
 RAGFLOW_CONFIG = {
-    "base_url": "http://localhost:9380",
-    "api_key": "your-api-key-here",
-    "timeout": 30
+    "base_url": "http://118.31.184.47/api/v1",
+    "api_key": "ragflow-VhZTNjNWY0ZGIxMjExZjBiMjg3NWE4Yj",
+    "dataset_id": "31f6e5b81e1411f18dd4e67a6a3f482a",
+    "vl_dataset_id": "9e91232c04e811f18c9e0664f063c4fe",
+    "timeout": 30,
+    "page_size": 10  # 每页文档数量
 }
 
 # =============================================================================
@@ -60,7 +63,7 @@ PAGE_CONFIG = {
         "title": "文档中心"
     },
     "hot_knowledge": {
-        "title": "热知识管理"
+        "title": "文件管理"
     }
 }
 
@@ -193,53 +196,7 @@ MOCK_USERS: Dict[str, Dict[str, Any]] = {
 }
 
 # =============================================================================
-# 模拟文档数据（带权限级别）
-# =============================================================================
-MOCK_DOCUMENTS: List[Dict[str, Any]] = [
-    {
-        "id": "doc_001",
-        "title": "酒店员工手册",
-        "content": "包含所有员工的基本行为规范和操作流程，适用于所有员工。",
-        "permission_level": 1,
-        "category": "基础文档",
-        "updated_at": "2024-01-15"
-    },
-    {
-        "id": "doc_002",
-        "title": "前台接待流程指南",
-        "content": "详细说明前台接待客人的标准流程，包括入住、退房、咨询等环节。",
-        "permission_level": 1,
-        "category": "操作手册",
-        "updated_at": "2024-01-20"
-    },
-    {
-        "id": "doc_003",
-        "title": "客户投诉处理案例集",
-        "content": "收集整理了50个典型客户投诉案例及处理方案，供管理人员参考。",
-        "permission_level": 2,
-        "category": "案例分析",
-        "updated_at": "2024-02-01"
-    },
-    {
-        "id": "doc_004",
-        "title": "月度财务报表分析",
-        "content": "包含本月收入、支出、利润分析，以及各部门业绩对比。仅供管理层查看。",
-        "permission_level": 3,
-        "category": "财务数据",
-        "updated_at": "2024-02-15"
-    },
-    {
-        "id": "doc_005",
-        "title": "员工绩效评估标准",
-        "content": "详细的员工绩效考核标准和评估表，涉及薪酬调整等敏感信息。",
-        "permission_level": 3,
-        "category": "人事档案",
-        "updated_at": "2024-02-10"
-    }
-]
-
-# =============================================================================
-# 模拟热知识数据
+# 模拟文件数据
 # =============================================================================
 MOCK_HOT_KNOWLEDGE: List[Dict[str, Any]] = [
     {

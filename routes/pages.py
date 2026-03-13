@@ -6,11 +6,12 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from typing import Optional, Dict, Any
+import httpx
 
 from config import (
-    APP_INFO, PAGE_CONFIG, TEMPLATE_DIR, MOCK_DOCUMENTS,
-    ROLE_LEVEL_MAP, ROLE_PROMPT_MAP, DIFY_CONFIG,
-    DIFY_ROLE_INPUTS_MAP
+    APP_INFO, PAGE_CONFIG, TEMPLATE_DIR,
+    ROLE_LEVEL_MAP, ROLE_PROMPT_MAP, ROLE_DISPLAY_MAP, DIFY_CONFIG,
+    DIFY_ROLE_INPUTS_MAP, RAGFLOW_CONFIG
 )
 from data_store import sessions, hot_knowledge_db
 import json
@@ -33,43 +34,108 @@ def get_current_user(request: Request) -> Optional[Dict[str, Any]]:
     return None
 
 
-def filter_documents_by_role(role: str, keyword: Optional[str] = None):
-    """根据用户角色过滤文档列表"""
-    user_level = get_user_role_level(role)
+async def fetch_documents_from_api(
+    role: str,
+    keyword: str = "",
+    page: int = 1,
+    page_size: int = 10
+) -> Dict[str, Any]:
+    """
+    从 RAGFlow API 获取文档列表
     
-    filtered = [
-        doc for doc in MOCK_DOCUMENTS
-        if doc["permission_level"] <= user_level
-    ]
+    Args:
+        role: 用户角色 (admin, manager, reception)
+        keyword: 搜索关键词
+        page: 页码
+        page_size: 每页数量
     
-    if keyword:
-        keyword = keyword.lower()
-        filtered = [
-            doc for doc in filtered
-            if keyword in doc["title"].lower() or keyword in doc["content"].lower()
-        ]
-    
-    return filtered
+    Returns:
+        Dict 包含 documents 列表和 total 总数
+    """
+    try:
+        base_url = RAGFLOW_CONFIG["base_url"]
+        dataset_id = RAGFLOW_CONFIG["dataset_id"]
+        api_key = RAGFLOW_CONFIG["api_key"]
+        
+        # 构建 metadata_condition 用于权限过滤
+        metadata_condition = {
+            "logic": "and",
+            "conditions": [
+                {
+                    "name": "role",
+                    "comparison_operator": "is",
+                    "value": role
+                }
+            ]
+        }
+        
+        # 构建请求 URL
+        url = f"{base_url}/datasets/{dataset_id}/documents"
+        params = {
+            "page": page,
+            "page_size": page_size,
+            "orderby": "create_time",
+            "desc": "true",
+            "keywords": keyword,
+            "metadata_condition": json.dumps(metadata_condition, ensure_ascii=False)
+        }
+        
+        headers = {
+            "Authorization": f"Bearer {api_key}"
+        }
+        
+        print(f"[RAGFlow API] Fetching documents for role: {role}, page: {page}, keyword: {keyword}")
+        
+        async with httpx.AsyncClient(timeout=float(RAGFLOW_CONFIG.get("timeout", 30))) as client:
+            response = await client.get(url, params=params, headers=headers)
+            
+            if response.status_code != 200:
+                print(f"[RAGFlow API] Error: {response.status_code}, {response.text}")
+                return {"documents": [], "total": 0}
+            
+            data = response.json()
+            
+            # 解析 API 响应
+            if data.get("code") == 0:
+                docs_data = data.get("data", {})
+                docs = docs_data.get("docs", [])
+                total = docs_data.get("total", 0)
+                
+                # 转换文档格式
+                documents = []
+                for doc in docs:
+                    documents.append({
+                        "id": doc.get("id", ""),
+                        "title": doc.get("name", "未命名文档"),
+                        "content": doc.get("content", "") or doc.get("description", "暂无描述"),
+                        "type": doc.get("type", "未知"),
+                        "updated_at": doc.get("update_time", doc.get("create_time", "未知")),
+                        "permission_level": get_permission_level_by_role(role),
+                        "chunk_count": doc.get("chunk_count", 0),
+                        "token_count": doc.get("token_count", 0),
+                        "progress": doc.get("progress", 0),
+                        "progress_msg": doc.get("progress_msg", "")
+                    })
+                
+                print(f"[RAGFlow API] Fetched {len(documents)} documents, total: {total}")
+                return {"documents": documents, "total": total}
+            else:
+                print(f"[RAGFlow API] API Error: {data.get('message', 'Unknown error')}")
+                return {"documents": [], "total": 0}
+                
+    except Exception as e:
+        print(f"[RAGFlow API] Exception: {e}")
+        return {"documents": [], "total": 0}
 
 
-def filter_documents_by_role(role: str, keyword: Optional[str] = None):
-    """根据用户角色过滤文档列表"""
-    from config import MOCK_DOCUMENTS
-    user_level = get_user_role_level(role)
-    
-    filtered = [
-        doc for doc in MOCK_DOCUMENTS
-        if doc["permission_level"] <= user_level
-    ]
-    
-    if keyword:
-        keyword = keyword.lower()
-        filtered = [
-            doc for doc in filtered
-            if keyword in doc["title"].lower() or keyword in doc["content"].lower()
-        ]
-    
-    return filtered
+def get_permission_level_by_role(role: str) -> int:
+    """根据角色获取权限级别"""
+    role_level_map = {
+        "admin": 3,
+        "manager": 2,
+        "reception": 1
+    }
+    return role_level_map.get(role, 1)
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -128,13 +194,11 @@ async def chat_page(request: Request):
 
 
 @router.get("/page/documents", response_class=HTMLResponse)
-async def documents_page(request: Request, keyword: str = ""):
-    """文档中心页面"""
+async def documents_page(request: Request):
+    """文档中心页面 - 仅渲染页面框架，数据通过 AJAX 获取"""
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/")
-    
-    documents = filter_documents_by_role(user["role"], keyword)
     
     return templates.TemplateResponse("documents.html", {
         "request": request,
@@ -142,17 +206,13 @@ async def documents_page(request: Request, keyword: str = ""):
         "logo": APP_INFO["logo"],
         "page_title": PAGE_CONFIG["documents"]["title"],
         "user": user,
-        "active_page": "documents",
-        "documents": documents,
-        "total_count": len(documents),
-        "visible_permission": f"级别 {get_user_role_level(user['role'])} 及以下",
-        "keyword": keyword
+        "active_page": "documents"
     })
 
 
 @router.get("/page/hot-knowledge", response_class=HTMLResponse)
 async def hot_knowledge_page(request: Request):
-    """热知识管理页面"""
+    """文件管理页面"""
     from fastapi import HTTPException
     user = get_current_user(request)
     if not user:

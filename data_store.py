@@ -9,5 +9,5 @@ from config import MOCK_HOT_KNOWLEDGE
 # 会话存储
 sessions: Dict[str, Dict[str, Any]] = {}
 
-# 热知识数据
+# 文件数据
 hot_knowledge_db: List[Dict[str, Any]] = MOCK_HOT_KNOWLEDGE.copy()

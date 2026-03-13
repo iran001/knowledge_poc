@@ -9,6 +9,7 @@ import time
 import os
 import signal
 import atexit
+from datetime import datetime
 
 # 存储子进程
 processes = []
@@ -36,9 +37,18 @@ def start_backend():
         "--port", "8000",
         "--reload"
     ]
-    # 将输出重定向到文件以便调试
-    log_file = open("backend.log", "w")
-    return subprocess.Popen(cmd, stdout=log_file, stderr=subprocess.STDOUT)
+    # 将输出重定向到 logs 目录下的日期命名文件
+    log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+    today = datetime.now().strftime('%Y-%m-%d')
+    log_file_path = os.path.join(log_dir, f'backend_{today}.log')
+    log_file = open(log_file_path, "a", encoding="utf-8", buffering=1)  # 行缓冲模式
+    
+    # 设置环境变量，确保 Python 输出无缓冲
+    env = os.environ.copy()
+    env['PYTHONUNBUFFERED'] = '1'
+    
+    return subprocess.Popen(cmd, stdout=log_file, stderr=subprocess.STDOUT, env=env)
 
 
 def main():

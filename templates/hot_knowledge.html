@@ -116,18 +116,18 @@
     <a href="/page/documents" class="btn btn-secondary">← 返回文档中心</a>
 </div>
 
-<!-- 添加新热知识 -->
+<!-- 添加新文件 -->
 <div class="form-section">
-    <h3>➕ 添加新热知识</h3>
+    <h3>➕ 添加新文件</h3>
     <form method="POST" action="/api/hot-knowledge-form">
         <div class="form-group">
             <label>标题</label>
-            <input type="text" name="title" placeholder="输入热知识标题" required>
+            <input type="text" name="title" placeholder="输入文件标题" required>
         </div>
         
         <div class="form-group">
             <label>内容</label>
-            <textarea name="content" placeholder="输入热知识详细内容" required></textarea>
+            <textarea name="content" placeholder="输入文件详细内容" required></textarea>
         </div>
         
         <div class="form-group">
@@ -139,13 +139,13 @@
             </select>
         </div>
         
-        <button type="submit" class="btn btn-primary">添加热知识</button>
+        <button type="submit" class="btn btn-primary">添加文件</button>
     </form>
 </div>
 
-<!-- 现有热知识列表 -->
+<!-- 现有文件列表 -->
 <div class="form-section">
-    <h3>📋 现有热知识</h3>
+    <h3>📋 现有文件</h3>
     <div class="knowledge-list">
         {% if knowledge_list %}
             {% for item in knowledge_list %}
@@ -162,7 +162,7 @@
             {% endfor %}
         {% else %}
             <div class="empty-state">
-                <p>暂无热知识</p>
+                <p>暂无文件</p>
             </div>
         {% endif %}
     </div>
