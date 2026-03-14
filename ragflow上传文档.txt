@@ -1,0 +1,83 @@
+第一步：身份认证 (Authentication)
+RAGFlow 通常在 HTTP Header 中验证身份。
+Header: Authorization: Bearer <YOUR_API_KEY>
+Content-Type: 根据接口不同，可能是 application/json 或 multipart/form-data。
+第二步：上传文件 (Upload File)
+这是核心步骤。你需要将文件以 multipart/form-data 格式发送到指定知识库。
+接口地址: POST /v1/knowledge_bases/{dataset_id}/documents
+注意：不同版本的 RAGFlow 路径可能略有差异，常见为 /api/v1/knowledge_bases/{id}/documents 或直接通过 dataset 接口。请以你部署版本的 Swagger 文档为准。
+请求参数:
+file: 二进制文件流 (Form-data)。
+parser_config (可选): JSON 字符串，指定解析规则（如分块大小、OCR 开关等）。
+Python 代码示例:
+import requests
+api_key = "ragflow-xxxxxxxxxxxx"
+dataset_id = "your-dataset-uuid-here"
+file_path = "./manual.pdf"
+base_url = "http://localhost:9380" # 替换为你的 RAGFlow 地址
+
+url = f"{base_url}/api/v1/knowledge_bases/{dataset_id}/documents"
+
+headers = {
+    "Authorization": f"Bearer {api_key}"
+    # 注意：使用 files 参数时，requests 会自动设置 Content-Type 为 multipart/form-data，不要手动设置
+}
+
+files = {
+    "file": open(file_path, "rb")
+}
+
+# 可选：自定义解析配置
+data = {
+    "parser_config": '{"chunk_token_num": 512, "layout_recognize": true}' 
+}
+
+response = requests.post(url, headers=headers, files=files, data=data)
+
+if response.status_code == 200:
+    result = response.json()
+    print("上传成功!")
+    # 通常返回中包含 document_id，后续步骤需要用到
+    doc_id = result['data'][0]['id'] 
+    print(f"Document ID: {doc_id}")
+else:
+    print(f"上传失败: {response.status_code} - {response.text}")
+第三步：启动解析任务 (Start Parsing)
+文件上传成功后，状态通常是 UNSTART 或 QUEUED。你需要显式调用接口触发解析（除非你的版本配置了自动解析）。
+接口地址: POST /v1/documents/{document_id}/parse (或类似路径，如 /api/v1/document/parse)
+作用: 通知后端开始对文件进行 OCR、版面分析、分块和向量化。
+Python 代码示例:
+# 接上一步获取的 doc_id
+parse_url = f"{base_url}/api/v1/documents/{doc_id}/parse"
+
+parse_response = requests.post(parse_url, headers=headers)
+
+if parse_response.status_code == 200:
+    print("解析任务已启动！")
+else:
+print(f"启动解析失败: {parse_response.text}")
+
+第四步：检查解析状态 (Check Status) (可选但推荐)
+解析是异步的，大文件可能需要几分钟。你可以轮询状态直到变为 DONE 或 FAIL。
+接口地址: GET /v1/documents/{document_id}
+返回字段: 关注 progress (进度 0-100) 和 status (RUNNING, DONE, FAIL)。
+Python参考：
+import time
+while True:
+    status_url = f"{base_url}/api/v1/documents/{doc_id}"
+    resp = requests.get(status_url, headers=headers)
+    data = resp.json()['data']
+    
+    status = data.get('status')
+    progress = data.get('progress', 0)
+    
+    print(f"当前状态: {status}, 进度: {progress}%")
+    
+    if status == 'DONE':
+        print("解析完成，可以开始问答了！")
+        break
+    elif status == 'FAIL':
+        print("解析失败，请检查日志。")
+        break
+    
+    time.sleep(5) # 每5秒查询一次

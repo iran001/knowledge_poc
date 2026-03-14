@@ -16,12 +16,15 @@ SERVER_CONFIG = {
 }
 
 # =============================================================================
-# Dify API 配置
+# Dify API 配置："api_key": "app-eMP8p1e8UcjxdNBZymXc0LdX",
 # =============================================================================
 DIFY_CONFIG = {
     "base_url": "http://116.62.30.61/v1",
     "api_key": "app-eMP8p1e8UcjxdNBZymXc0LdX",
+    "workflow_api_key": "app-AvE4LlNMgeuI3Q2OKryvcluj",
     "chat_messages_endpoint": "/chat-messages",
+    "filecheck_endpoint": "/workflows/6ba4cfeb-fb68-4e7d-824e-76f68cda29ac/run",
+    "upload_endpoint": "/files/upload",
     "timeout": 30
 }
 
@@ -165,3 +168,11 @@ MOCK_KNOWLEDGE_UPLOAD: List[Dict[str, Any]] = [
 # 前端全局常量配置
 # =============================================================================
 API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
+
+# =============================================================================
+# Dify 已上传文件记录（自动生成的文件 ID 映射）
+# 文件名 -> Dify file_id
+# =============================================================================
+DIFY_UPLOADED_FILES: Dict[str, str] = {
+    "洲际酒店-B2B支付解决方案CN.txt": "44b32150-b1bb-4d01-a37a-a7ff47456abb"
+}

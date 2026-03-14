@@ -8,102 +8,183 @@
         margin-bottom: 20px;
     }
     
-    .form-section {
+    .upload-section {
         background: white;
         border-radius: 10px;
-        padding: 1.5rem;
+        padding: 2rem;
         margin-bottom: 20px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    
-    .form-section h3 {
-        margin-bottom: 1rem;
-        color: #333;
-    }
-    
-    .form-group {
-        margin-bottom: 15px;
-    }
-    
-    .form-group label {
-        display: block;
-        margin-bottom: 5px;
-        color: #666;
-        font-size: 0.9rem;
-    }
-    
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-        width: 100%;
-        padding: 0.6rem 1rem;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 0.95rem;
-    }
-    
-    .form-group textarea {
-        min-height: 100px;
-        resize: vertical;
-    }
-    
-    .knowledge-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .knowledge-item {
-        background: #fff3e0;
-        border-left: 4px solid #ff9800;
-        border-radius: 8px;
-        padding: 1rem;
-    }
-    
-    .knowledge-title {
-        font-weight: 500;
-        color: #333;
-        margin-bottom: 5px;
-    }
-    
-    .knowledge-content {
-        color: #666;
-        font-size: 0.9rem;
-        margin-bottom: 5px;
-    }
-    
-    .knowledge-meta {
-        font-size: 0.8rem;
-        color: #999;
-    }
-    
-    .tag-priority {
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 10px;
-        font-size: 0.75rem;
-        margin-left: 10px;
-    }
-    
-    .tag-high {
-        background: #f8d7da;
-        color: #721c24;
-    }
-    
-    .tag-normal {
-        background: #d1ecf1;
-        color: #0c5460;
-    }
-    
-    .tag-low {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .empty-state {
         text-align: center;
-        padding: 2rem;
-        color: #666;
+    }
+    
+    .upload-section h3 {
+        margin-bottom: 1.5rem;
+        color: #333;
+    }
+    
+    .upload-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 32px;
+        background: #1C64F2;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .upload-btn:hover {
+        background: #1e40af;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(28, 100, 242, 0.3);
+    }
+    
+    .upload-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .file-input {
+        display: none;
+    }
+    
+    .upload-status {
+        margin-top: 20px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        display: none;
+    }
+    
+    .upload-status.success {
+        display: block;
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+    }
+    
+    .upload-status.error {
+        display: block;
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+    }
+    
+    .upload-status.info {
+        display: block;
+        background: #dbeafe;
+        color: #1e40af;
+        border: 1px solid #93c5fd;
+    }
+    
+    .upload-status.loading {
+        display: block;
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+    
+    /* 冲突提示弹窗 */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-overlay.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .modal-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .modal-header .icon {
+        font-size: 24px;
+    }
+    
+    .modal-header h4 {
+        margin: 0;
+        color: #dc2626;
+        font-size: 18px;
+    }
+    
+    .modal-body {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .modal-body .conflict-reason {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 12px;
+        margin: 12px 0;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    
+    .modal-footer {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+    
+    .btn-cancel {
+        padding: 8px 20px;
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-cancel:hover {
+        background: #e5e7eb;
+    }
+    
+    .btn-confirm {
+        padding: 8px 20px;
+        background: #dc2626;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-confirm:hover {
+        background: #b91c1c;
+    }
+    
+    .upload-hint {
+        margin-top: 16px;
+        color: #6b7280;
+        font-size: 14px;
     }
 </style>
 {% endblock %}
@@ -116,55 +197,139 @@
     <a href="/page/documents" class="btn btn-secondary">← 返回文档中心</a>
 </div>
 
-<!-- 添加新文件 -->
-<div class="form-section">
-    <h3>➕ 添加新文件</h3>
-    <form method="POST" action="/api/knowledge-upload-form">
-        <div class="form-group">
-            <label>标题</label>
-            <input type="text" name="title" placeholder="输入文件标题" required>
-        </div>
-        
-        <div class="form-group">
-            <label>内容</label>
-            <textarea name="content" placeholder="输入文件详细内容" required></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label>优先级</label>
-            <select name="priority">
-                <option value="low">低</option>
-                <option value="normal" selected>中</option>
-                <option value="high">高</option>
-            </select>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">添加文件</button>
-    </form>
+<!-- 文件上传区域 -->
+<div class="upload-section">
+    <h3>📎 上传文档到知识库</h3>
+    <input type="file" id="fileInput" class="file-input" accept=".txt,.pdf,.doc,.docx,.md">
+    <button class="upload-btn" id="uploadBtn" onclick="selectFile()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        添加文件
+    </button>
+    <div class="upload-hint">支持格式：TXT、PDF、DOC、DOCX、MD</div>
+    <div class="upload-status" id="uploadStatus"></div>
 </div>
 
-<!-- 现有文件列表 -->
-<div class="form-section">
-    <h3>📋 现有文件</h3>
-    <div class="knowledge-list">
-        {% if knowledge_list %}
-            {% for item in knowledge_list %}
-            <div class="knowledge-item">
-                <div class="knowledge-title">
-                    {{ item.title }}
-                    <span class="tag-priority tag-{{ item.priority }}">
-                        {% if item.priority == 'high' %}高{% elif item.priority == 'normal' %}中{% else %}低{% endif %}
-                    </span>
-                </div>
-                <div class="knowledge-content">{{ item.content }}</div>
-                <div class="knowledge-meta">添加日期: {{ item.added_at }}</div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <p>暂无文件</p>
-            </div>
-        {% endif %}
+<!-- 冲突提示弹窗 -->
+<div class="modal-overlay" id="conflictModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="icon">⚠️</span>
+            <h4>检测到文件冲突</h4>
+        </div>
+        <div class="modal-body">
+            <div id="conflictPrompt"></div>
+            <div class="conflict-reason" id="conflictReason"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeConflictModal()">取消上传</button>
+            <button class="btn-confirm" onclick="confirmReplace()">替换原文件</button>
+        </div>
     </div>
 </div>
+
+<script>
+    let selectedFile = null;
+    let conflictData = null;
+    
+    // 选择文件
+    function selectFile() {
+        document.getElementById('fileInput').click();
+    }
+    
+    // 文件选择变化
+    document.getElementById('fileInput').addEventListener('change', async function(e) {
+        if (e.target.files.length > 0) {
+            selectedFile = e.target.files[0];
+            await uploadFile();
+        }
+    });
+    
+    // 显示状态
+    function showStatus(message, type) {
+        const statusEl = document.getElementById('uploadStatus');
+        statusEl.textContent = message;
+        statusEl.className = 'upload-status ' + type;
+    }
+    
+    // 隐藏状态
+    function hideStatus() {
+        const statusEl = document.getElementById('uploadStatus');
+        statusEl.className = 'upload-status';
+    }
+    
+    // 上传文件
+    async function uploadFile(forceReplace = false) {
+        if (!selectedFile) return;
+        
+        const uploadBtn = document.getElementById('uploadBtn');
+        uploadBtn.disabled = true;
+        
+        if (forceReplace) {
+            showStatus('正在替换文件...', 'loading');
+        } else {
+            showStatus('正在上传文件到 Dify...', 'loading');
+        }
+        
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        if (forceReplace) {
+            formData.append('force_replace', 'true');
+            // 如果有冲突数据，传递冲突文件名
+            if (conflictData && conflictData.conflict_file) {
+                formData.append('conflict_file', conflictData.conflict_file);
+            }
+        }
+        
+        try {
+            const response = await fetch('/api/upload-document', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                if (data.conflict) {
+                    // 显示冲突弹窗
+                    conflictData = data;
+                    document.getElementById('conflictPrompt').textContent = data.prompt || '检测到文件与现有知识库内容冲突';
+                    document.getElementById('conflictReason').textContent = data.conflict_reason || '';
+                    document.getElementById('conflictModal').classList.add('active');
+                    showStatus(`文件冲突 (与 ${data.conflict_file || '现有文件'})，等待用户确认...`, 'error');
+                } else if (data.success) {
+                    showStatus(data.message || '文件上传成功！', 'success');
+                    selectedFile = null;
+                    document.getElementById('fileInput').value = '';
+                    conflictData = null;
+                }
+            } else {
+                showStatus(data.detail || data.message || '上传失败，请重试', 'error');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            showStatus('上传失败：' + error.message, 'error');
+        } finally {
+            uploadBtn.disabled = false;
+        }
+    }
+    
+    // 关闭冲突弹窗
+    function closeConflictModal() {
+        document.getElementById('conflictModal').classList.remove('active');
+        showStatus('已取消上传', 'info');
+        selectedFile = null;
+        document.getElementById('fileInput').value = '';
+        conflictData = null;
+    }
+    
+    // 确认替换
+    async function confirmReplace() {
+        document.getElementById('conflictModal').classList.remove('active');
+        await uploadFile(true);
+    }
+</script>
 {% endblock %}
