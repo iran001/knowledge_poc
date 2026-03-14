@@ -1299,38 +1299,27 @@ async def api_upload_document(
                     detail=f"上传到知识库失败: {upload_result.get('error', '未知错误')}"
                 )
         
-        # 步骤4: 依次与已有文件进行冲突检查
+        # 步骤4: 依次与已有文件进行冲突检查（一旦检测到冲突立即停止）
         logger.info(f"[Upload Document] Step 4: Checking conflicts with {len(DIFY_UPLOADED_FILES)} existing files...")
         
-        conflict_results = []
         for existing_filename, existing_file_id in DIFY_UPLOADED_FILES.items():
             logger.info(f"[Upload Document] Checking conflict with: {existing_filename} (id: {existing_file_id})")
             
             conflict_result = await call_dify_conflict_check_with_files(newfile_id, existing_file_id)
             
             if conflict_result.get("status") == "false":
-                logger.info(f"[Upload Document] Conflict detected with {existing_filename}")
-                conflict_results.append({
-                    "filename": existing_filename,
-                    "file_id": existing_file_id,
-                    "result": conflict_result
-                })
-        
-        # 如果有冲突，返回冲突信息给前端
-        if conflict_results:
-            # 返回第一个冲突的详细信息
-            first_conflict = conflict_results[0]
-            logger.info(f"[Upload Document] Returning conflict info to frontend, conflict file: {first_conflict['filename']}")
-            return {
-                "success": False,
-                "conflict": True,
-                "status": "false",
-                "conflict_point": first_conflict["result"].get("conflict_point", ""),
-                "conflict_reason": first_conflict["result"].get("conflict_reason", ""),
-                "prompt": first_conflict["result"].get("prompt", "检测到文件冲突"),
-                "conflict_file": first_conflict["filename"],
-                "conflict_count": len(conflict_results)
-            }
+                logger.info(f"[Upload Document] Conflict detected with {existing_filename}, stopping conflict check")
+                # 立即返回冲突信息给前端
+                return {
+                    "success": False,
+                    "conflict": True,
+                    "status": "false",
+                    "conflict_point": conflict_result.get("conflict_point", ""),
+                    "conflict_reason": conflict_result.get("conflict_reason", ""),
+                    "prompt": conflict_result.get("prompt", "检测到文件冲突"),
+                    "conflict_file": existing_filename,
+                    "conflict_count": 1
+                }
         
         # 步骤5: 没有冲突，上传到 RAGFlow
         logger.info("[Upload Document] No conflict detected, proceeding to upload to RAGFlow")
