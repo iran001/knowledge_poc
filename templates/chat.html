@@ -205,33 +205,38 @@
 
     .typing-indicator {
         display: flex;
-        gap: 4px;
+        align-items: center;
         padding: 12px 16px;
         background: white;
         border: 1px solid #e5e7eb;
         border-radius: 12px;
         width: fit-content;
+        font-size: 14px;
+        color: #6b7280;
     }
 
-    .typing-indicator span {
-        width: 8px;
-        height: 8px;
-        background: #9ca3af;
-        border-radius: 50%;
-        animation: typing 1.4s infinite;
+    .typing-indicator .thinking-dots {
+        display: inline-flex;
+        gap: 2px;
+        margin-left: 4px;
     }
 
-    .typing-indicator span:nth-child(2) {
+    .typing-indicator .thinking-dots span {
+        animation: thinkingBlink 1.4s infinite;
+        opacity: 0.3;
+    }
+
+    .typing-indicator .thinking-dots span:nth-child(2) {
         animation-delay: 0.2s;
     }
 
-    .typing-indicator span:nth-child(3) {
+    .typing-indicator .thinking-dots span:nth-child(3) {
         animation-delay: 0.4s;
     }
 
-    @keyframes typing {
-        0%, 60%, 100% { transform: translateY(0); }
-        30% { transform: translateY(-10px); }
+    @keyframes thinkingBlink {
+        0%, 60%, 100% { opacity: 0.3; }
+        30% { opacity: 1; }
     }
 
     .welcome-message {
@@ -469,7 +474,10 @@
         } catch (error) {
             console.error('API Error:', error);
             removeTypingIndicator(typingId);
-            addMessage('bot', '抱歉，服务暂时不可用，请稍后重试。');
+            // 如果是stream开始前的错误，添加错误消息
+            if (!currentBotMessageId) {
+                addMessage('bot', '抱歉，服务暂时不可用，请稍后重试。');
+            }
             isTyping = false;
         }
     }
@@ -502,6 +510,7 @@
         answerContent = '';
         isInThinkTag = false;
         currentBotMessageId = null;
+        let hasReceivedContent = false;
 
         const response = await fetch(DIFY_CONFIG.baseUrl + DIFY_CONFIG.endpoint, {
             method: 'POST',
@@ -523,11 +532,8 @@
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // 移除输入中状态
-        removeTypingIndicator(typingId);
-
-        // 创建机器人消息容器
-        currentBotMessageId = addMessage('bot', '', true);
+        // 不立即创建消息容器，等有内容时再创建
+        currentBotMessageId = null;
 
         // 处理流式响应
         const reader = response.body.getReader();
@@ -573,6 +579,13 @@
                                     buffer += messageContent;
                                     console.log('[Buffer] Updated, length:', buffer.length);
 
+                                    // 第一次收到内容时，移除打字指示器并创建消息容器
+                                    if (!hasReceivedContent) {
+                                        hasReceivedContent = true;
+                                        removeTypingIndicator(typingId);
+                                        currentBotMessageId = addMessage('bot', '', true);
+                                    }
+
                                     // 实时解析并更新显示
                                     const parsed = parseContent(buffer);
                                     updateBotMessage(currentBotMessageId, parsed.thinks, parsed.answer);
@@ -587,6 +600,13 @@
                             case 'message_end':
                                 // 消息结束，最终解析
                                 console.log('[Message End] Buffer length:', buffer.length, 'Content preview:', buffer.substring(0, 100));
+
+                                // 如果还没创建消息容器（没收到内容），移除打字指示器并创建空消息
+                                if (!hasReceivedContent) {
+                                    removeTypingIndicator(typingId);
+                                    currentBotMessageId = addMessage('bot', '', true);
+                                }
+
                                 const finalParsed = parseContent(buffer);
                                 updateBotMessage(currentBotMessageId, finalParsed.thinks, finalParsed.answer);
                                 isTyping = false;
@@ -624,9 +644,13 @@
                             case 'error':
                                 // 错误
                                 console.error('[Dify Error]', data);
-                                if (currentBotMessageId) {
-                                    updateBotMessage(currentBotMessageId, [], '抱歉，处理请求时发生错误。');
+
+                                // 移除打字指示器，如果还没创建消息则创建一个显示错误
+                                removeTypingIndicator(typingId);
+                                if (!currentBotMessageId) {
+                                    currentBotMessageId = addMessage('bot', '', true);
                                 }
+                                updateBotMessage(currentBotMessageId, [], '抱歉，处理请求时发生错误。');
                                 isTyping = false;
                                 break;
                         }
@@ -682,7 +706,7 @@
 
         let html = '';
 
-        // 显示 think 内容
+        // 显示 think 内容（思考过程样式）- 有内容就显示
         if (thinks && thinks.length > 0) {
             const thinkText = thinks.join('\n\n');
             html += `
@@ -693,8 +717,8 @@
             `;
         }
 
-        // 显示答案内容
-        if (answer) {
+        // 显示答案内容（回答样式，绿色）- 有内容才显示
+        if (answer && answer.trim()) {
             html += `
                 <div class="answer-content">
                     <div class="answer-label">回答</div>
@@ -725,12 +749,14 @@
         const typingId = 'typing-' + Date.now();
 
         const typingHtml = `
-            <div class="message bot" id="${typingId}">
-                <div class="message-avatar">🤖</div>
+            <div class="message bot" id="${typingId}" style="padding-left: 48px;">
                 <div class="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <span>正在思考</span>
+                    <span class="thinking-dots">
+                        <span>。</span>
+                        <span>。</span>
+                        <span>。</span>
+                    </span>
                 </div>
             </div>
         `;
