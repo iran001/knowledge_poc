@@ -35,7 +35,7 @@ RAGFLOW_CONFIG = {
     "vl_dataset_id": "9e91232c04e811f18c9e0664f063c4fe",
     "special_dataset_id": "3c521b90074b11f1826d0664f063c4fe",
     "timeout": 30,
-    "page_size": 10  # 每页文档数量
+    "page_size": 10
 }
 
 # =============================================================================
@@ -56,114 +56,52 @@ PAGE_CONFIG = {
         "title": "登录",
         "background_image": "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1920"
     },
-    "chat": {
-        "title": "智能对话",
-        "welcome_message": "您好！我是IHG智能助手，请问有什么可以帮助您？"
-    },
-    "documents": {
-        "title": "文档中心"
-    },
-    "knowledge_upload": {
-        "title": "文件上传"
-    }
+    "chat": {"title": "智能对话"},
+    "documents": {"title": "文档中心"},
+    "knowledge_upload": {"title": "文件上传"}
 }
 
 # =============================================================================
-# 角色显示映射
+# 角色配置（合并显示、权限、Prompt、Dify输入变量）
 # =============================================================================
-ROLE_DISPLAY_MAP: Dict[str, Dict[str, Any]] = {
-    "admin": {"name": "系统管理员", "color": "🔴", "desc": "拥有最高权限，可访问所有数据和配置"},
-    "manager": {"name": "客服经理", "color": "🟠", "desc": "可访问标准文档和案例分析"},
-    "reception": {"name": "前台", "color": "🟢", "desc": "仅可访问公开文档和基础问答"}
-}
-
-# =============================================================================
-# 角色权限级别映射（用于RBAC）
-# =============================================================================
-ROLE_LEVEL_MAP = {
-    "admin": 3,
-    "manager": 2,
-    "reception": 1
-}
-
-# =============================================================================
-# 角色Prompt映射（用于动态注入）
-# =============================================================================
-ROLE_PROMPT_MAP = {
-    "admin": """你是IHG酒店的系统管理员助手，拥有最高权限。
+ROLES: Dict[str, Dict[str, Any]] = {
+    "admin": {
+        "display_name": "系统管理员",
+        "color": "🔴",
+        "description": "拥有最高权限，可访问所有数据和配置",
+        "level": 3,
+        "prompt": """你是IHG酒店的系统管理员助手，拥有最高权限。
 你可以访问所有文档和数据，包括财务信息、人事档案、系统配置等敏感内容。
 请以专业、高效的方式回答管理员的问题。""",
-
-    "manager": """你是IHG酒店的客服经理助手，拥有标准权限。
+        "dify_inputs": {"role": "admin", "role_name": "系统管理员", "access_level": "high"}
+    },
+    "manager": {
+        "display_name": "客服经理",
+        "color": "🟠",
+        "description": "可访问标准文档和案例分析",
+        "level": 2,
+        "prompt": """你是IHG酒店的客服经理助手，拥有标准权限。
 你可以访问标准操作文档、案例分析、客户反馈等资料。
 请帮助经理处理客户投诉、分析服务问题、提供改进建议。""",
-
-    "reception": """你是IHG酒店的前台助手，拥有基础权限。
+        "dify_inputs": {"role": "manager", "role_name": "客服经理", "access_level": "medium"}
+    },
+    "reception": {
+        "display_name": "前台",
+        "color": "🟢",
+        "description": "仅可访问公开文档和基础问答",
+        "level": 1,
+        "prompt": """你是IHG酒店的前台助手，拥有基础权限。
 你只能访问公开的操作手册、常见问题解答、酒店设施介绍等基础文档。
-请友好地回答客人的咨询问题，帮助他们办理入住、了解酒店服务。"""
-}
-
-# =============================================================================
-# Dify Chatbot Embed 配置（角色相关）
-# =============================================================================
-
-# Dify Chatbot 基础配置
-DIFY_CHATBOT_CONFIG = {
-    "base_url": "http://116.62.30.61",
-    "token": "RgIwnnnxUrynbPCN",
-    "app_secret": "app-eMP8p1e8UcjxdNBZymXc0LdX"
-}
-
-# 角色对应的输入变量（传递给 Dify 工作流）
-DIFY_ROLE_INPUTS_MAP: Dict[str, Dict[str, str]] = {
-    "admin": {
-        "role": "admin",
-        "role_name": "系统管理员",
-        "access_level": "high"
-    },
-    "manager": {
-        "role": "manager",
-        "role_name": "客服经理",
-        "access_level": "medium"
-    },
-    "reception": {
-        "role": "reception",
-        "role_name": "前台接待",
-        "access_level": "low"
+请友好地回答客人的咨询问题，帮助他们办理入住、了解酒店服务。""",
+        "dify_inputs": {"role": "reception", "role_name": "前台接待", "access_level": "low"}
     }
 }
 
-# 角色对应的系统变量（Dify 系统级配置）
-DIFY_ROLE_SYSTEM_VARS_MAP: Dict[str, Dict[str, str]] = {
-    "admin": {
-        "user_type": "administrator",
-        "permissions": "full_access"
-    },
-    "manager": {
-        "user_type": "manager",
-        "permissions": "standard_access"
-    },
-    "reception": {
-        "user_type": "front_desk",
-        "permissions": "limited_access"
-    }
-}
-
-# 角色对应的用户变量（用户头像和显示名称）
-DIFY_ROLE_USER_VARS_MAP: Dict[str, Dict[str, str]] = {
-    "admin": {
-        "avatar_url": "https://cdn-icons-png.flaticon.com/512/295/295128.png",
-        "name": "系统管理员"
-    },
-    "manager": {
-        "avatar_url": "https://cdn-icons-png.flaticon.com/512/295/295117.png",
-        "name": "客服经理"
-    },
-    "reception": {
-        "avatar_url": "https://cdn-icons-png.flaticon.com/512/295/295105.png",
-        "name": "前台接待"
-    }
-}
+# 兼容旧代码的映射（从 ROLES 派生）
+ROLE_DISPLAY_MAP = {k: {"name": v["display_name"], "color": v["color"], "desc": v["description"]} for k, v in ROLES.items()}
+ROLE_LEVEL_MAP = {k: v["level"] for k, v in ROLES.items()}
+ROLE_PROMPT_MAP = {k: v["prompt"] for k, v in ROLES.items()}
+DIFY_ROLE_INPUTS_MAP = {k: v["dify_inputs"] for k, v in ROLES.items()}
 
 # =============================================================================
 # 模板和静态文件目录
@@ -224,47 +162,6 @@ MOCK_KNOWLEDGE_UPLOAD: List[Dict[str, Any]] = [
 ]
 
 # =============================================================================
-# Streamlit前端配置（仅在导入streamlit时使用）
-# =============================================================================
-try:
-    import streamlit as st
-
-    def init_page_config():
-        """初始化页面配置"""
-        st.set_page_config(
-            page_title="IHG智能问答平台",
-            page_icon="🤖",
-            layout="wide",
-            initial_sidebar_state="expanded"
-        )
-
-    def init_session_state():
-        """初始化 Streamlit Session State"""
-        if "authenticated" not in st.session_state:
-            st.session_state.authenticated = False
-        if "current_user" not in st.session_state:
-            st.session_state.current_user = None
-        if "user_role" not in st.session_state:
-            st.session_state.user_role = None
-        if "page" not in st.session_state:
-            st.session_state.page = "login"
-        if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
-        if "documents" not in st.session_state:
-            st.session_state.documents = []
-
-except ImportError:
-    # 当streamlit未安装时（后端环境），提供空函数
-    def init_page_config():
-        pass
-
-    def init_session_state():
-        pass
-
-
-# =============================================================================
 # 前端全局常量配置
 # =============================================================================
-# 自动检测后端地址（支持同站点部署和独立部署）
 API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
-
