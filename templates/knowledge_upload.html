@@ -186,6 +186,12 @@
         color: #6b7280;
         font-size: 14px;
     }
+
+    .upload-size-hint {
+        margin-top: 8px;
+        color: #9ca3af;
+        font-size: 12px;
+    }
 </style>
 {% endblock %}
 
@@ -210,6 +216,7 @@
         添加文件
     </button>
     <div class="upload-hint">支持格式：TXT、PDF、DOC、DOCX、MD</div>
+    <div class="upload-size-hint">文档 < 15.00 MB, 图片 < 10.00 MB, 音频 < 50.00 MB, 视频 < 100.00 MB</div>
     <div class="upload-status" id="uploadStatus"></div>
 </div>
 
@@ -271,7 +278,7 @@
         if (forceReplace) {
             showStatus('正在替换文件...', 'loading');
         } else {
-            showStatus('正在上传文件到 Dify...', 'loading');
+            showStatus('正在解析文档并做冲突检测...', 'loading');
         }
         
         const formData = new FormData();

@@ -42,5 +42,49 @@
       "user_role": "admin",
       "user_display_name": "系统管理员"
     }
+  },
+  {
+    "role": "user",
+    "content": "积分发放用户指南",
+    "think_content": "",
+    "timestamp": "2026-03-15T09:40:10.638885",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  },
+  {
+    "role": "bot",
+    "content": "根据知识库内容，以下是关于积分发放的用户指南：\n\n### 1. 积分发放情况查询\n积分发放情况可以每天通过以下两种方式进行查询：\n- **LoyaltyConnect**：酒店运营团队可以通过该系统查看已发放的积分奖励。\n- **IHG Reporting**：报告路径为 Merlin -> IHG Reporting -> Guests -> IHG Rewards Club -> Point Deposit and Goodwill Events Report。\n\n注意：\n- 报告只显示近一个月的信息，请存档保留。([RB&E Loyalty Program_Member Benefits 会员餐饮礼遇.pdf](URL))\n\n### 2. 系统权限和培训\n为了确保积分发放的准确性和合规性，酒店需要进行以下操作：\n- **系统权限**：指定同事获得 LoyaltyConnect 系统登录权限。\n- **内部培训**：餐饮一线员工必须熟知会员餐饮礼遇，熟悉系统操作并执行。\n- **IT设置**：针对 Infrasys 系统酒店，务必完成系统设置。\n- **财务审核**：财务部需定期审核消费记录，了解积分发放详情。\n\n### 3. 积分发放监测和核查\n为了防止积分滥用，酒店应采取以下措施：\n- **任命忠诚度计划冠军**：建议由餐饮总监、餐饮销售经理或中餐厅经理担任，负责项目沟通和运营。\n- **监控和报告**：通过报告路径 Merlin -> IHG Reporting -> Guests -> IHG Rewards Club -> Point Deposit and Goodwill Events Report 进行监控。\n- **联系支持**：如怀疑存在计划滥用情况或错误发放积分，请联系 askihgonerewards.cn@ihg.com。\n\n### 4. 手动积分奖励请求\n对于手动积分奖励请求，具体步骤如下：\n1. 选择 **Create Point Award**。\n2. 填写所需字段：\n   - **Membership ID (IHG One Rewards member number)**\n   - **Choose Point Award Type**\n   - **Choose Description**\n   - **Choose Reason and enter comment when prompted.**\n3. 点击 **Submit**。\n\n### 参考文献\n- [RB&E Loyalty Program_Member Benefits 会员餐饮礼遇.pdf](URL)\n- [04302025 LoyaltyConnect User Guide 2025.pdf](URL)\n\n希望以上信息对您有所帮助！如有进一步问题，请随时询问。\n",
+    "think_content": "",
+    "timestamp": "2026-03-15T09:40:10.650577",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  },
+  {
+    "role": "user",
+    "content": "IHG直销渠道支付宝支付优化方案",
+    "think_content": "",
+    "timestamp": "2026-03-15T15:21:31.144755",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  },
+  {
+    "role": "bot",
+    "content": "IHG直销渠道支付宝支付优化方案的核心内容如下，基于知识库中的相关文档进行整理：\n\n---\n\n### **1. 项目概述**\n该项目旨在优化IHG直销渠道的支付宝支付方式，通过切换至杉德支付（SandPay）作为新的支付宝支付服务商，统一处理支付宝和微信支付的订单及资金流。这一优化不仅降低了交易手续费，还提升了宾客支付体验。\n\n- **项目目标**：\n  - 确保支付流程更加顺畅，减少支付失败的情况。\n  - 统一支付宝和微信支付的资金处理方式，提升财务管理效率。\n  - 节约成本：将支付宝支付的交易手续费费率从原来的0.38%~0.6%降至0.27%。\n\n- **时间表**：\n  - 自2026年9月22日起，停止使用现有的支付宝支付通道，切换至杉德支付的支付宝支付通道。\n\n> 参考来源：[Ehanced Alipay Project Presentation.pdf](URL)  \n> ![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-b1db1eeed3334043)\n\n---\n\n### **2. 对酒店的影响**\n#### **2.1 财务影响**\n- **节约成本**：由于交易手续费费率降低，酒店在支付宝支付上的支出将显著减少。\n- **资金管理简化**：通过杉德支付，酒店无需担心因支付宝账户问题导致的资金冻结问题。\n\n#### **2.2 宾客体验**\n- 支付流程更加顺畅，减少了支付失败的可能性。\n- 提升了宾客在IHG直销渠道（如官网、APP、小程序等）使用支付宝支付的便利性。\n\n> 参考来源：[Ehanced Alipay Project Presentation1.pdf](URL)  \n> ![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-deb756125d7bf786)\n\n---\n\n### **3. 酒店需要采取的行动**\n#### **3.1 无需额外费用**\n酒店无需为此次优化支付任何额外费用，所有技术整合和支持由IHG总部负责完成。\n\n#### **3.2 系统对接与测试**\n- 酒店需配合完成与杉德支付的技术对接和测试工作，确保新支付通道的顺利上线。\n- 如果酒店有任何特殊需求或疑问，可联系IHG技术支持团队。\n\n#### **3.3 培训与沟通**\n- 酒店员工需接受相关培训，熟悉新支付流程的变化。\n- 向宾客宣传优化后的支付体验，提升直销渠道的使用率。\n\n---\n\n### **4. 支付优化后的适用场景**\n根据知识库中的表格信息，优化后的支付宝支付将适用于以下场景：\n\n#### **4.1 全额预付且不可取消**\n- **IHG官网**：支持支付宝（预付）、微信支付（预付）、银联支付（预付）。\n- **IHG APP**：支持支付宝（预付）、微信支付（预付）、银联支付（预付）。\n- **IHG支付宝小程序**：仅支持支付宝（预付）。\n- **IHG微信小程序**：支持微信支付（预付）、银联支付（预付）。\n\n#### **4.2 可免费取消价格**\n- **IHG官网**：支持银联支付（预授权）。\n- **IHG APP**：支持芝麻信用住（信用付）、支付宝（预授权）、微信支付（预授权）、银联支付（预授权）。\n- **IHG支付宝小程序**：支持芝麻信用住、支付宝（预授权）。\n- **IHG微信小程序**：支持微信支付（预授权）、银联支付（预授权）。\n\n> 参考来源：[IHG数字直销渠道数字支付简介20241010.pdf](URL)  \n> ![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-779b089c8547416a)\n\n---\n\n### **5. 常见问题解答 (Q&A)**\n#### **Q1: 新支付通道是否会影响现有支付方式？**\nA1: 不会。优化后的支付通道仅针对支付宝支付，其他支付方式（如微信支付、银联支付）保持不变。\n\n#### **Q2: 酒店如何确认资金到账情况？**\nA2: 通过杉德支付系统，酒店可以实时查看资金到账情况，并与财务部门核实。\n\n#### **Q3: 如果出现支付问题，如何解决？**\nA3: 酒店可联系IHG技术支持团队或杉德支付客服，提供详细的支付记录以协助解决问题。\n\n---\n\n### **参考文献**\n- [Ehanced Alipay Project Presentation.pdf](URL)\n- [Ehanced Alipay Project Presentation1.pdf](URL)\n- [IHG数字直销渠道数字支付简介20241010.pdf](URL)\n\n希望以上内容对您有所帮助！如有进一步问题，请随时询问。\n",
+    "think_content": "",
+    "timestamp": "2026-03-15T15:21:31.163686",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
   }
 ]

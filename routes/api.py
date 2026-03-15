@@ -404,7 +404,7 @@ async def api_upload_document(
         
         if not newfile_id:
             logger.error("[Upload Document] Failed to upload file to Dify")
-            raise HTTPException(status_code=500, detail="文件上传到 Dify 失败")
+            raise HTTPException(status_code=500, detail="文件上传到知识库 失败")
         
         logger.info(f"[Upload Document] File uploaded to Dify, file_id: {newfile_id}")
         
