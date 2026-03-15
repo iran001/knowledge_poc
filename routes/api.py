@@ -31,6 +31,10 @@ from services import (
     upload_to_ragflow,
     update_dify_uploaded_files,
 )
+from services.similarity_service import (
+    load_summary_files_content,
+    find_top_similar_files,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -422,8 +426,12 @@ async def api_upload_document(
         if force_replace.lower() == "true":
             return await _handle_force_replace(file, file_content, filename, newfile_id, conflict_file)
         
-        # 步骤4: 冲突检查
-        conflict_response = await _check_conflicts(newfile_id, filename)
+        # 步骤4: 冲突检查（传入文件内容用于本地相似度计算）
+        try:
+            new_file_text = file_content.decode('utf-8', errors='ignore')
+        except:
+            new_file_text = ""
+        conflict_response = await _check_conflicts(newfile_id, filename, new_file_text)
         if conflict_response:
             return conflict_response
         
@@ -507,15 +515,56 @@ async def _handle_force_replace(
         )
 
 
-async def _check_conflicts(newfile_id: str, filename: str) -> Optional[Dict[str, Any]]:
+async def _check_conflicts(
+    newfile_id: str,
+    _filename: str,
+    new_file_content: str
+) -> Optional[Dict[str, Any]]:
     """
-    检查文件冲突
+    检查文件冲突（优化版：使用本地相似度预筛选 + Top-K Dify 精确检查）
+    
+    流程：
+    1. 本地加载所有已有文件内容
+    2. 计算新文件与所有已有文件的相似度
+    3. 只取 Top-K 最相似的文件调用 Dify 进行精确冲突检查
+    
     返回: 有冲突时返回冲突响应，无冲突返回 None
     """
     logger.info(f"[Upload Document] Step 4: Checking conflicts with {len(DIFY_UPLOADED_FILES)} existing files...")
+    logger.info("[Upload Document] Using optimized conflict detection (similarity pre-filter + Top-K Dify check)")
     
-    for existing_filename, existing_file_id in DIFY_UPLOADED_FILES.items():
-        logger.info(f"[Upload Document] Checking conflict with: {existing_filename} (id: {existing_file_id})")
+    # 步骤 4.1: 加载所有已有文件内容
+    existing_files_content = load_summary_files_content()
+    if not existing_files_content:
+        logger.warning("[Upload Document] No summary files found, skipping conflict check")
+        return None
+    
+    # 步骤 4.2: 本地相似度预筛选 - 找出最相似的 Top-K 个文件
+    top_k = 5  # 只检查最相似的 5 个文件
+    top_similar_files = find_top_similar_files(
+        new_file_content=new_file_content,
+        existing_files=existing_files_content,
+        existing_file_ids=DIFY_UPLOADED_FILES,
+        top_k=top_k,
+        similarity_threshold=0.05  # 相似度阈值，低于此值的文件不检查
+    )
+    
+    if not top_similar_files:
+        logger.info("[Upload Document] No similar files found above threshold, skipping Dify conflict check")
+        return None
+    
+    # 步骤 4.3: 对 Top-K 文件调用 Dify 进行精确冲突检查
+    logger.info(f"[Upload Document] Performing Dify conflict check on top {len(top_similar_files)} similar files...")
+    
+    for file_info in top_similar_files:
+        existing_filename = file_info.filename
+        existing_file_id = file_info.file_id
+        
+        if not existing_file_id:
+            logger.warning(f"[Upload Document] Skipping {existing_filename}: no file_id found")
+            continue
+        
+        logger.info(f"[Upload Document] Dify checking: {existing_filename} (similarity: {file_info.similarity_score:.3f}, matches: {file_info.keyword_match_count})")
         
         conflict_result = await call_dify_conflict_check_with_files(newfile_id, existing_file_id)
         
@@ -529,9 +578,11 @@ async def _check_conflicts(newfile_id: str, filename: str) -> Optional[Dict[str,
                 "conflict_reason": conflict_result.get("conflict_reason", ""),
                 "prompt": conflict_result.get("prompt", "检测到文件冲突"),
                 "conflict_file": existing_filename,
-                "conflict_count": 1
+                "conflict_count": 1,
+                "similarity_score": round(file_info.similarity_score, 3)
             }
     
+    logger.info(f"[Upload Document] No conflict detected after checking {len(top_similar_files)} most similar files")
     return None
 
 
