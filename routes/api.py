@@ -400,11 +400,17 @@ async def api_upload_document(
         
         # 步骤1: 上传文件到 Dify 获取 file_id
         logger.info("[Upload Document] Step 1: Uploading file to Dify...")
-        newfile_id = await upload_file_to_dify(file, file_content)
+        dify_result = await upload_file_to_dify(file, file_content)
         
+        if not dify_result.get("success"):
+            error_msg = dify_result.get("error", "未知错误")
+            logger.error(f"[Upload Document] Failed to upload file to Dify: {error_msg}")
+            raise HTTPException(status_code=500, detail=f"上传到 Dify 失败: {error_msg}")
+        
+        newfile_id = str(dify_result.get("file_id", ""))
         if not newfile_id:
-            logger.error("[Upload Document] Failed to upload file to Dify")
-            raise HTTPException(status_code=500, detail="文件上传到知识库 失败")
+            logger.error("[Upload Document] Dify returned empty file_id")
+            raise HTTPException(status_code=500, detail="上传到 Dify 失败: 返回的 file_id 为空")
         
         logger.info(f"[Upload Document] File uploaded to Dify, file_id: {newfile_id}")
         

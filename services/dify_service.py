@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Dify 文件上传
 # =============================================================================
 
-async def upload_file_to_dify(file: UploadFile, file_content: bytes) -> Optional[str]:
+async def upload_file_to_dify(file: UploadFile, file_content: bytes) -> Dict[str, Any]:
     """
     上传文件到 Dify，获取 file_id
     
@@ -29,7 +29,8 @@ async def upload_file_to_dify(file: UploadFile, file_content: bytes) -> Optional
         file_content: 文件内容字节
         
     Returns:
-        成功返回 file_id，失败返回 None
+        成功返回 {"success": True, "file_id": xxx}
+        失败返回 {"success": False, "error": "错误信息"}
     """
     try:
         base_url = str(DIFY_CONFIG.get("base_url", "")).rstrip("/")
@@ -60,20 +61,33 @@ async def upload_file_to_dify(file: UploadFile, file_content: bytes) -> Optional
                 file_id = data.get('id')
                 if file_id:
                     logger.info(f"[Dify File Upload] Success, file_id: {file_id}")
-                    return file_id
+                    return {"success": True, "file_id": file_id}
                 else:
-                    logger.error(f"[Dify File Upload] Response missing 'id' field: {data}")
-                    return None
+                    error_msg = f"响应缺少 'id' 字段: {data}"
+                    logger.error(f"[Dify File Upload] {error_msg}")
+                    return {"success": False, "error": error_msg}
             else:
+                error_text = response.text
                 logger.error(f"[Dify File Upload] HTTP Error: {response.status_code}")
-                logger.error(f"[Dify File Upload] Error Response: {response.text[:500]}")
-                return None
+                logger.error(f"[Dify File Upload] Error Response: {error_text[:500]}")
+                # 尝试解析 JSON 错误响应
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message') or error_data.get('error') or f"HTTP {response.status_code}: {error_text[:200]}"
+                except:
+                    error_msg = f"HTTP {response.status_code}: {error_text[:200]}"
+                return {"success": False, "error": error_msg}
                 
+    except httpx.TimeoutException as e:
+        error_msg = "上传超时，请稍后重试"
+        logger.error(f"[Dify File Upload] Timeout: {e}")
+        return {"success": False, "error": error_msg}
     except Exception as e:
+        error_msg = f"上传异常: {str(e)}"
         logger.error(f"[Dify File Upload] Exception: {e}")
         import traceback
         logger.error(f"[Dify File Upload] Traceback: {traceback.format_exc()}")
-        return None
+        return {"success": False, "error": error_msg}
 
 
 def _detect_mime_type(filename: str) -> str:

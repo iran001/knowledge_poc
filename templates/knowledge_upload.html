@@ -58,29 +58,32 @@
         padding: 12px 16px;
         border-radius: 8px;
         display: none;
+        word-wrap: break-word;
+        line-height: 1.5;
     }
-    
+
     .upload-status.success {
         display: block;
         background: #d1fae5;
         color: #065f46;
         border: 1px solid #6ee7b7;
     }
-    
+
     .upload-status.error {
         display: block;
         background: #fee2e2;
         color: #991b1b;
         border: 1px solid #fca5a5;
+        white-space: pre-wrap;
     }
-    
+
     .upload-status.info {
         display: block;
         background: #dbeafe;
         color: #1e40af;
         border: 1px solid #93c5fd;
     }
-    
+
     .upload-status.loading {
         display: block;
         background: #f3f4f6;
@@ -312,13 +315,19 @@
                     selectedFile = null;
                     document.getElementById('fileInput').value = '';
                     conflictData = null;
+                } else {
+                    // 业务逻辑失败（success: false 但不是冲突）
+                    const errorMsg = data.message || data.error || '上传失败，请重试';
+                    showStatus('上传失败：' + errorMsg, 'error');
                 }
             } else {
-                showStatus(data.detail || data.message || '上传失败，请重试', 'error');
+                // HTTP 错误响应
+                const errorMsg = data.detail || data.message || data.error || `服务器错误 (${response.status})`;
+                showStatus('上传失败：' + errorMsg, 'error');
             }
         } catch (error) {
             console.error('Upload error:', error);
-            showStatus('上传失败：' + error.message, 'error');
+            showStatus('上传失败：' + (error.message || '网络请求异常'), 'error');
         } finally {
             uploadBtn.disabled = false;
         }
