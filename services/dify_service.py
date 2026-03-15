@@ -50,9 +50,9 @@ async def upload_file_to_dify(file: UploadFile, file_content: bytes) -> Dict[str
         headers = {"Authorization": f"Bearer {api_key}"}
         files = {'file': (file.filename, file_content, mime_type)}
         
-        async with httpx.AsyncClient(timeout=60) as client:
+        async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=headers, files=files)
-            
+
             logger.info("[Dify File Upload] RESPONSE")
             logger.info(f"[Dify File Upload] Status Code: {response.status_code}")
             
@@ -138,9 +138,9 @@ async def call_dify_conflict_check_with_files(newfile_id: str, overfile_id: str)
         
         _log_conflict_check_request(url, newfile_id, overfile_id, payload)
         
-        async with httpx.AsyncClient(timeout=60) as client:
+        async with httpx.AsyncClient(timeout=120) as client:
             response = await client.post(url, json=payload, headers=headers)
-            
+
             logger.info("[Dify Conflict Check] RESPONSE")
             logger.info(f"[Dify Conflict Check] Status Code: {response.status_code}")
             
@@ -211,10 +211,10 @@ async def call_dify_conflict_check(new_file_content: str, existing_file_content:
         
         _log_text_conflict_request(url, len(new_file_content), len(existing_file_content))
         
-        async with httpx.AsyncClient(timeout=60) as client:
+        async with httpx.AsyncClient(timeout=120) as client:
             response = await client.post(url, json=payload, headers=headers)
             return _handle_conflict_response(response)
-            
+
     except httpx.TimeoutException as e:
         logger.error(f"[Dify Workflow] Timeout Error: {e}")
         return _default_conflict_result()
@@ -312,7 +312,7 @@ async def call_dify_chat(role: str, message: str, conversation_id: str, system_p
         logger.info(f"[Dify Chat API] URL: {url}")
         logger.info(f"[Dify Chat API] Payload: {json.dumps(payload, ensure_ascii=False)[:500]}...")
         
-        async with httpx.AsyncClient(timeout=float(DIFY_CONFIG.get("timeout", 30))) as client:
+        async with httpx.AsyncClient(timeout=float(DIFY_CONFIG.get("timeout", 60))) as client:
             response = await client.post(url, json=payload, headers=headers)
             
             logger.info("[Dify Chat API] RESPONSE")

@@ -25,7 +25,7 @@ DIFY_CONFIG = {
     "chat_messages_endpoint": "/chat-messages",
     "filecheck_endpoint": "/workflows/6ba4cfeb-fb68-4e7d-824e-76f68cda29ac/run",
     "upload_endpoint": "/files/upload",
-    "timeout": 30
+    "timeout": 60
 }
 
 # =============================================================================
@@ -37,7 +37,7 @@ RAGFLOW_CONFIG = {
     "dataset_id": "31f6e5b81e1411f18dd4e67a6a3f482a",
     "vl_dataset_id": "9e91232c04e811f18c9e0664f063c4fe",
     "special_dataset_id": "3c521b90074b11f1826d0664f063c4fe",
-    "timeout": 30,
+    "timeout": 60,
     "page_size": 10
 }
 
