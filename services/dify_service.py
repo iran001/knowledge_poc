@@ -113,13 +113,13 @@ def _detect_mime_type(filename: str) -> str:
 # Dify 冲突检查 (Workflow API)
 # =============================================================================
 
-async def call_dify_conflict_check_with_files(newfile_id: str, overfile_id: str) -> Dict[str, Any]:
+async def call_dify_conflict_check_with_files(newfile_id: str, overfile_ids: list) -> Dict[str, Any]:
     """
     调用 Dify 冲突检查接口 (使用 file_id)
     
     Args:
         newfile_id: 新上传文件的 Dify file_id
-        overfile_id: 已有文件的 Dify file_id
+        overfile_ids: 已有文件的 Dify file_id 列表 (支持批量)
         
     Returns:
         冲突检查结果字典
@@ -130,13 +130,13 @@ async def call_dify_conflict_check_with_files(newfile_id: str, overfile_id: str)
         api_key = str(DIFY_CONFIG.get("workflow_api_key", ""))
         
         url = f"{base_url}{_ensure_leading_slash(filecheck_endpoint)}"
-        payload = build_conflict_check_payload(newfile_id, overfile_id)
+        payload = build_conflict_check_payload(newfile_id, overfile_ids)
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
         
-        _log_conflict_check_request(url, newfile_id, overfile_id, payload)
+        _log_conflict_check_request(url, newfile_id, overfile_ids, payload)
         
         async with httpx.AsyncClient(timeout=120) as client:
             response = await client.post(url, json=payload, headers=headers)
@@ -160,24 +160,38 @@ async def call_dify_conflict_check_with_files(newfile_id: str, overfile_id: str)
         return _default_conflict_result()
 
 
-def build_conflict_check_payload(newfile_id: str, overfile_id: str) -> Dict[str, Any]:
-    """构建冲突检查请求的 payload"""
+def build_conflict_check_payload(newfile_id: str, overfile_ids: list) -> Dict[str, Any]:
+    """构建冲突检查请求的 payload，支持批量 overfile"""
+    # 支持单个ID或ID列表
+    if isinstance(overfile_ids, str):
+        overfile_ids = [overfile_ids]
+    
+    overfile_list = [
+        {"transfer_method": "local_file", "upload_file_id": fid, "type": "document"}
+        for fid in overfile_ids
+    ]
+    
     return {
         "inputs": {
             "newfile": [{"transfer_method": "local_file", "upload_file_id": newfile_id, "type": "document"}],
-            "overfile": [{"transfer_method": "local_file", "upload_file_id": overfile_id, "type": "document"}]
+            "overfile": overfile_list
         },
         "user": "admin"
     }
 
 
-def _log_conflict_check_request(url: str, newfile_id: str, overfile_id: str, payload: Dict):
+def _log_conflict_check_request(url: str, newfile_id: str, overfile_ids: list, payload: Dict):
     """记录冲突检查请求日志"""
+    # 支持单个ID或ID列表
+    if isinstance(overfile_ids, str):
+        overfile_ids = [overfile_ids]
+    
     logger.info("=" * 80)
     logger.info("[Dify Conflict Check] REQUEST")
     logger.info(f"[Dify Conflict Check] URL: {url}")
     logger.info(f"[Dify Conflict Check] newfile_id: {newfile_id}")
-    logger.info(f"[Dify Conflict Check] overfile_id: {overfile_id}")
+    logger.info(f"[Dify Conflict Check] overfile_ids count: {len(overfile_ids)}")
+    logger.info(f"[Dify Conflict Check] overfile_ids: {overfile_ids}")
     logger.info(f"[Dify Conflict Check] Payload: {json.dumps(payload, ensure_ascii=False)}")
     logger.info("=" * 80)
 

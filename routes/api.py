@@ -514,38 +514,53 @@ async def _handle_force_replace(
 
 async def _check_conflicts(
     newfile_id: str,
-    _filename: str,
+    filename: str,
     _new_file_content: str
 ) -> Optional[Dict[str, Any]]:
     """
-    检查文件冲突（直接调用 Dify 接口与所有已有文件进行比较）
+    检查文件冲突（批量调用 Dify 接口与所有已有文件进行比较）
     
     流程：
-    遍历 DIFY_UPLOADED_FILES 中的所有文件，依次调用 Dify 进行冲突检查
-    一旦检测到冲突立即停止
+    将 DIFY_UPLOADED_FILES 中的所有文件ID以数组形式传给 Dify，仅调用一次接口
     
     返回: 有冲突时返回冲突响应，无冲突返回 None
     """
     logger.info(f"[Upload Document] Step 4: Checking conflicts with {len(DIFY_UPLOADED_FILES)} existing files...")
-    logger.info("[Upload Document] Using direct Dify conflict check for all existing files")
+    logger.info("[Upload Document] Using batch Dify conflict check (single API call)")
     
+    # 收集所有已有文件的 ID 和文件名映射
+    existing_file_ids = []
+    id_to_filename_map = {}
     for existing_filename, existing_file_id in DIFY_UPLOADED_FILES.items():
-        logger.info(f"[Upload Document] Checking conflict with: {existing_filename} (id: {existing_file_id})")
+        existing_file_ids.append(existing_file_id)
+        id_to_filename_map[existing_file_id] = existing_filename
+    
+    if not existing_file_ids:
+        logger.info("[Upload Document] No existing files to check")
+        return None
+    
+    # 批量调用 Dify 冲突检查接口（单次调用）
+    logger.info(f"[Upload Document] Calling Dify with {len(existing_file_ids)} files in batch")
+    conflict_result = await call_dify_conflict_check_with_files(newfile_id, existing_file_ids)
+    
+    if conflict_result.get("status") == "false":
+        # 从返回结果中获取冲突文件信息
+        conflict_filename = conflict_result.get("conflict_file", "")
+        if not conflict_filename:
+            # 如果返回中没有 conflict_file，使用传入的文件名或第一个文件
+            conflict_filename = filename
         
-        conflict_result = await call_dify_conflict_check_with_files(newfile_id, existing_file_id)
-        
-        if conflict_result.get("status") == "false":
-            logger.info(f"[Upload Document] Conflict detected with {existing_filename}, stopping conflict check")
-            return {
-                "success": False,
-                "conflict": True,
-                "status": "false",
-                "conflict_point": conflict_result.get("conflict_point", ""),
-                "conflict_reason": conflict_result.get("conflict_reason", ""),
-                "prompt": conflict_result.get("prompt", "检测到文件冲突"),
-                "conflict_file": existing_filename,
-                "conflict_count": 1
-            }
+        logger.info(f"[Upload Document] Conflict detected with {conflict_filename}")
+        return {
+            "success": False,
+            "conflict": True,
+            "status": "false",
+            "conflict_point": conflict_result.get("conflict_point", ""),
+            "conflict_reason": conflict_result.get("conflict_reason", ""),
+            "prompt": conflict_result.get("prompt", "检测到文件冲突"),
+            "conflict_file": conflict_filename,
+            "conflict_count": 1
+        }
     
     logger.info(f"[Upload Document] No conflict detected after checking {len(DIFY_UPLOADED_FILES)} files")
     return None
