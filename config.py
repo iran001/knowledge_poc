@@ -16,7 +16,7 @@ SERVER_CONFIG = {
 }
 
 # =============================================================================
-# Dify API 配置："api_key": "app-eMP8p1e8UcjxdNBZymXc0LdX",
+# Dify API 配置
 # =============================================================================
 DIFY_CONFIG = {
     "base_url": "http://116.62.30.61/v1",
@@ -33,7 +33,7 @@ DIFY_CONFIG = {
 # =============================================================================
 RAGFLOW_CONFIG = {
     "base_url": "http://118.31.184.47/api/v1",
-    "api_key": "ragflow-VhZTNjNWY0ZGIxMjExZjBiMjg3NWE4Yj",
+    "api_key": "ragflow-Q3NDEzYzcwNGE1ZDExZjBhMTMxODY3Ym",
     "dataset_id": "31f6e5b81e1411f18dd4e67a6a3f482a",
     "vl_dataset_id": "9e91232c04e811f18c9e0664f063c4fe",
     "special_dataset_id": "3c521b90074b11f1826d0664f063c4fe",

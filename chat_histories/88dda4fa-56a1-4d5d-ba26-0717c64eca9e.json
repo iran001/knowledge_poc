@@ -20,5 +20,27 @@
       "user_role": "admin",
       "user_display_name": "系统管理员"
     }
+  },
+  {
+    "role": "user",
+    "content": "洲际大使贵宾计划",
+    "think_content": "",
+    "timestamp": "2026-03-16T13:21:35.235124",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  },
+  {
+    "role": "bot",
+    "content": "洲际大使贵宾计划是洲际酒店集团推出的一项**付费忠诚度计划**，专为入住**洲际酒店及度假村**（InterContinental Hotels & Resorts）和**六善养生及酒店集团**（Six Senses）旗下酒店的会员设计，旨在提供一系列专属礼遇与奖励。\n\n根据[会员招募词汇表—大中华地区](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/c35f41db1e8211f194f4e67a6a3f482a)和[会员招募指南-Enrollment Guide GC 2025_v2_ZHCN.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/79f7fa5f1e2211f18f82e67a6a3f482a)的内容：\n\n- **年费**：225美元，或可使用积分支付（仅限在线或致电会员中心）；\n- **核心价值**：提升宾客在洲际酒店及度假村的入住体验；\n- **专属礼遇**：包括但不限于周末住宿礼券、免费房晚、餐饮消费抵用券等（具体权益可参考皇家大使相关条款）；\n- **适用品牌**：主要适用于洲际酒店及度假村和六善酒店。\n\n![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-bbae1c3d42bd557e)\n\n此外，该计划还设有**洲际大使招募激励计划**，鼓励酒店员工完成新会员招募或现有会员续订，并提供相应积分奖励。\n\n2024年的招募数据显示，全年共完成**821例**（新注册292例，续订529例），同比增长37%（详见[2025 Q1 Loyalty Leader Webinar1.pdf](http://118.31.184.47/api/v1/datasets/9e91232c04e811f18c9e0664f063c4fe/documents/4f35d5811e0811f1b3c4e67a6a3f482a)）：\n\n![](http://118.31.184.47/v1/document/image/9e91232c04e811f18c9e0664f063c4fe-69a2a88d2ec08667)\n\n如需了解更多关于条款细则或联系宾客关怀中心，可参考[RAM&KIC Hotel Brief_bilingual(1).pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/c31a28a01e8211f192c2e67a6a3f482a)，其中列明了联系方式，例如大中华区电话：021-20334882，邮箱：ambassador.cn@ihg.com。\n\n参考文献：  \n[会员招募词汇表—大中华地区](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/c35f41db1e8211f194f4e67a6a3f482a)  \n[会员招募指南-Enrollment Guide GC 2025_v2_ZHCN.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/79f7fa5f1e2211f18f82e67a6a3f482a)  \n[2025 Q1 Loyalty Leader Webinar1.pdf](http://118.31.184.47/api/v1/datasets/9e91232c04e811f18c9e0664f063c4fe/documents/4f35d5811e0811f1b3c4e67a6a3f482a)  \n[RAM&KIC Hotel Brief_bilingual(1).pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/c31a28a01e8211f192c2e67a6a3f482a)\n",
+    "think_content": "",
+    "timestamp": "2026-03-16T13:21:35.256310",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
   }
 ]

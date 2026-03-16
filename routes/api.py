@@ -604,3 +604,106 @@ async def _upload_to_ragflow_and_save(file: UploadFile, file_content: bytes, fil
             status_code=500, 
             detail=f"上传到知识库失败: {upload_result.get('error', '未知错误')}"
         )
+
+
+# =============================================================================
+# 链接代理 API - 用于访问需要 api_key 的外部链接
+# =============================================================================
+
+class ProxyLinkRequest(BaseModel):
+    """代理链接请求"""
+    url: str
+
+
+@router.post("/proxy-link")
+async def proxy_link(request: ProxyLinkRequest):
+    """
+    代理访问外部链接，自动添加 Ragflow api_key 到 header
+    用于支持 [text](url) 格式的链接点击访问
+    """
+    import httpx
+    from config import RAGFLOW_CONFIG
+    
+    target_url = request.url
+    api_key = str(RAGFLOW_CONFIG.get("api_key", ""))
+    
+    logger.info(f"[Proxy Link] Proxying request to: {target_url}, api_key: {api_key}")
+    
+    try:
+        # 使用 GET 方式访问目标 URL，添加 Authorization header
+        headers = {
+            "Authorization": f"Bearer {api_key}"
+        }
+        
+        async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+            response = await client.get(target_url, headers=headers)
+            
+            logger.info(f"[Proxy Link] Response status: {response.status_code}")
+            logger.info(f"[Proxy Link] Response headers: {dict(response.headers)}")
+            
+            # 从 Content-Disposition header 中提取文件名
+            original_filename = None
+            content_disposition = response.headers.get("Content-Disposition", "")
+            if content_disposition:
+                # 解析 filename="xxx" 或 filename*=UTF-8''xxx
+                import re
+                # 优先匹配 filename="..." 或 filename='...' 引号内的所有内容
+                filename_match = re.search(r'filename=[\'"]([^\'"]*)[\'"]', content_disposition, re.IGNORECASE)
+                if not filename_match:
+                    # 尝试匹配 filename*=UTF-8''xxx 格式
+                    filename_match = re.search(r'filename\*=[\'"]?(?:UTF-8[\'"]{0,3})?([^;\s]+)', content_disposition, re.IGNORECASE)
+                if filename_match:
+                    original_filename = filename_match.group(1)
+                    # URL decode if needed
+                    try:
+                        from urllib.parse import unquote
+                        original_filename = unquote(original_filename)
+                    except:
+                        pass
+            
+            # 如果 header 中没有 filename，从 URL 路径提取
+            if not original_filename:
+                from urllib.parse import urlparse, unquote
+                parsed_url = urlparse(target_url)
+                path_parts = parsed_url.path.split('/')
+                if path_parts and path_parts[-1]:
+                    original_filename = unquote(path_parts[-1])
+            
+            logger.info(f"[Proxy Link] Original filename: {original_filename}")
+            
+            # 获取响应的 Content-Type
+            content_type = response.headers.get("Content-Type", "application/octet-stream")
+            
+            # 如果响应是 JSON 格式，说明可能是错误信息，返回给前端显示
+            if "application/json" in content_type:
+                try:
+                    json_data = response.json()
+                    error_msg = json_data.get("message") or json_data.get("error") or str(json_data)
+                    logger.error(f"[Proxy Link] Target returned JSON error: {error_msg}")
+                    raise HTTPException(status_code=400, detail=f"目标接口返回错误: {error_msg}")
+                except HTTPException:
+                    raise
+                except Exception as e:
+                    logger.error(f"[Proxy Link] Failed to parse JSON response: {e}")
+                    raise HTTPException(status_code=400, detail="目标接口返回错误数据")
+            
+            # 返回响应内容，附加原始文件名到自定义 header（用于文件下载）
+            from fastapi.responses import Response
+            response_headers = {
+                "Content-Type": content_type
+            }
+            if original_filename:
+                response_headers["X-Original-Filename"] = original_filename
+            
+            return Response(
+                content=response.content,
+                status_code=response.status_code,
+                headers=response_headers
+            )
+            
+    except httpx.TimeoutException:
+        logger.error("[Proxy Link] Request timeout")
+        raise HTTPException(status_code=504, detail="请求超时")
+    except Exception as e:
+        logger.error(f"[Proxy Link] Error: {e}")
+        raise HTTPException(status_code=500, detail=f"代理请求失败: {str(e)}")

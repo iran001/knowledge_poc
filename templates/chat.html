@@ -359,6 +359,34 @@
         margin: 8px 0;
     }
 
+    /* 聊天消息中的链接样式 */
+    .message-link {
+        color: #1C64F2;
+        text-decoration: none;
+        border-bottom: 1px solid #1C64F2;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .message-link:hover {
+        color: #1e40af;
+        border-bottom-color: #1e40af;
+        background: rgba(28, 100, 242, 0.1);
+        padding: 0 2px;
+        border-radius: 2px;
+    }
+
+    .message-content a {
+        color: #1C64F2;
+        text-decoration: none;
+        border-bottom: 1px solid #1C64F2;
+    }
+
+    .message-content a:hover {
+        color: #1e40af;
+        border-bottom-color: #1e40af;
+    }
+
     /* 图片预览模态框 */
     .image-preview-modal {
         display: none;
@@ -840,22 +868,108 @@
         return div.innerHTML;
     }
 
-    // 检测并转换图片 URL 为 img 标签
+    // 检测并转换消息中的特殊格式为 HTML
+    // 1. ![](http链接) → 渲染成 <img>
+    // 2. [xxx](http链接) → 渲染成 <a> 标签，点击通过代理访问
     function convertImagesToHtml(text) {
         if (!text) return '';
-        
+
         // 先进行 HTML 转义
         let escapedText = escapeHtml(text);
-        
-        // 匹配括号内的图片 URL 格式: (http://.../image/...)
+
+        // 步骤1: 处理 ![](http链接) 格式 - 渲染成图片
+        // 匹配 ![](url) 格式，不包括前面有其他字符的情况（避免与 [text](url) 冲突）
+        const imagePattern = /!\[([^\]]*)\]\((https?:\/\/[^\s<>")]+)\)/gi;
+        escapedText = escapedText.replace(imagePattern, function(match, alt, url) {
+            return `<img src="${url}" class="message-image" alt="${alt || '图片'}" onclick="previewImage('${url}')" title="点击查看大图">`;
+        });
+
+        // 步骤2: 处理 [xxx](http链接) 格式 - 渲染成可点击链接
+        // 匹配 [text](url) 格式，但排除已经被处理的 ![...](...) 图片格式
+        const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s<>")]+)\)/gi;
+        escapedText = escapedText.replace(linkPattern, function(match, linkText, url) {
+            // 通过代理接口访问，后端会添加 api_key header
+            return `<a href="javascript:void(0)" class="message-link" onclick="openProxyLink('${url}')">${linkText}</a>`;
+        });
+
+        // 步骤3: 兼容旧的括号内图片 URL 格式: (http://.../image/...)
         const bracketImagePattern = /\((https?:\/\/[^\s<>"()]+\/(?:image|images|document\/image|file)[^\s<>"()]*)\)/gi;
-        
-        // 将括号内的图片 URL 替换为 img 标签（保留括号）
         escapedText = escapedText.replace(bracketImagePattern, function(match, url) {
+            // 如果已经被替换成 img 标签，则跳过
+            if (match.includes('<img')) return match;
             return `(<img src="${url}" class="message-image" alt="图片" onclick="previewImage('${url}')" title="点击查看大图">)`;
         });
-        
+
         return escapedText;
+    }
+
+    // 通过代理打开链接（后端会添加 api_key header）
+    async function openProxyLink(url) {
+        try {
+            // 调用后端代理接口
+            const response = await fetch('/api/proxy-link', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: url })
+            });
+
+            if (response.ok) {
+                // 如果后端返回成功，下载返回内容
+                const blob = await response.blob();
+                const contentType = response.headers.get('Content-Type') || 'application/octet-stream';
+                
+                // 优先从后端返回的 header 中获取文件名
+                let filename = response.headers.get('X-Original-Filename');
+                
+                // 如果后端没有提供文件名，从 URL 中提取或使用默认名称
+                if (!filename) {
+                    filename = 'download';
+                    try {
+                        const urlObj = new URL(url);
+                        const pathParts = urlObj.pathname.split('/');
+                        const lastPart = pathParts[pathParts.length - 1];
+                        if (lastPart && lastPart.includes('.')) {
+                            filename = lastPart;
+                        } else {
+                            // 根据 Content-Type 猜测扩展名
+                            const extMap = {
+                                'application/pdf': '.pdf',
+                                'image/png': '.png',
+                                'image/jpeg': '.jpg',
+                                'image/jpg': '.jpg',
+                                'image/gif': '.gif',
+                                'text/plain': '.txt',
+                                'application/json': '.json'
+                            };
+                            const ext = extMap[contentType] || '';
+                            filename = 'download' + ext;
+                        }
+                    } catch (e) {
+                        console.error('Parse URL error:', e);
+                    }
+                }
+                
+                // 创建下载链接
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(downloadUrl);
+                
+                console.log('[Proxy Link] Download started:', filename, 'Type:', contentType);
+            } else {
+                const data = await response.json();
+                alert('访问链接失败: ' + (data.detail || '未知错误'));
+            }
+        } catch (error) {
+            console.error('Proxy link error:', error);
+            alert('下载失败: ' + error.message);
+        }
     }
 
     // 图片预览功能
