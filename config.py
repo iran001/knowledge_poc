@@ -23,7 +23,7 @@ DIFY_CONFIG = {
     "api_key": "app-eMP8p1e8UcjxdNBZymXc0LdX",
     "workflow_api_key": "app-AvE4LlNMgeuI3Q2OKryvcluj",
     "chat_messages_endpoint": "/chat-messages",
-    "filecheck_endpoint": "/workflows/6275a259-6d35-4498-86fa-9b40d7e296d2/run",
+    "filecheck_endpoint": "/workflows/run",
     "upload_endpoint": "/files/upload",
     "timeout": 60
 }
