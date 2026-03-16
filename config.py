@@ -174,6 +174,6 @@ API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
 # 文件名 -> Dify file_id
 # =============================================================================
 DIFY_UPLOADED_FILES: Dict[str, str] = {
-    "压缩总结1.txt": "f98909c6-755f-4dd9-8350-afc387ccb391",
-    "压缩总结2.txt": "8279d6b0-ad43-4b68-b03c-6096afa467f0"
+    "压缩总结1.txt": "5a5e6710-ea79-4f5b-930b-d3de755fe761",
+    "压缩总结2.txt": "05554641-6930-462d-b0c7-62a6d6a02e3e"
 }
