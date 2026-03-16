@@ -104,12 +104,16 @@ async def fetch_documents_from_api(
                 # 转换文档格式
                 documents = []
                 for doc in docs:
+                    # 格式化更新日期
+                    updated_at = doc.get("update_time") or doc.get("create_time")
+                    formatted_date = _format_datetime(updated_at)
+                    
                     documents.append({
                         "id": doc.get("id", ""),
                         "title": doc.get("name", "未命名文档"),
                         "content": doc.get("content", "") or doc.get("description", "暂无描述"),
                         "type": doc.get("type", "未知"),
-                        "updated_at": doc.get("update_time", doc.get("create_time", "未知")),
+                        "updated_at": formatted_date,
                         "permission_level": get_permission_level_by_role(role),
                         "chunk_count": doc.get("chunk_count", 0),
                         "token_count": doc.get("token_count", 0),
@@ -126,6 +130,43 @@ async def fetch_documents_from_api(
     except Exception as e:
         print(f"[RAGFlow API] Exception: {e}")
         return {"documents": [], "total": 0}
+
+
+def _format_datetime(dt_value) -> str:
+    """
+    格式化日期时间为可读字符串
+    支持时间戳(秒/毫秒)和ISO格式字符串
+    """
+    if not dt_value:
+        return "未知"
+    
+    try:
+        from datetime import datetime
+        
+        # 如果是数字（时间戳）
+        if isinstance(dt_value, (int, float)):
+            # 判断是秒还是毫秒（大于1e10认为是毫秒）
+            if dt_value > 1e10:
+                dt_value = dt_value / 1000
+            dt = datetime.fromtimestamp(dt_value)
+        # 如果是字符串（ISO格式）
+        elif isinstance(dt_value, str):
+            # 替换 Z 为 +00:00 以兼容 Python 3.6+
+            dt_str = dt_value.replace('Z', '+00:00')
+            # 尝试解析 ISO 格式
+            try:
+                dt = datetime.fromisoformat(dt_str)
+            except:
+                # 如果解析失败，直接返回原字符串
+                return dt_value
+        else:
+            return str(dt_value)
+        
+        # 格式化为中文日期时间格式
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+    except Exception as e:
+        # 格式化失败返回原值
+        return str(dt_value)
 
 
 def get_permission_level_by_role(role: str) -> int:

@@ -4,6 +4,7 @@ RAGFlow API 服务 - 封装所有与 RAGFlow 平台的交互
 
 import json
 import logging
+from datetime import datetime
 from typing import Dict, Any, List
 
 import httpx
@@ -12,6 +13,41 @@ from fastapi import UploadFile
 from config import RAGFLOW_CONFIG
 
 logger = logging.getLogger(__name__)
+
+
+def _format_datetime(dt_value) -> str:
+    """
+    格式化日期时间为可读字符串
+    支持时间戳(秒/毫秒)和ISO格式字符串
+    """
+    if not dt_value:
+        return "未知"
+    
+    try:
+        # 如果是数字（时间戳）
+        if isinstance(dt_value, (int, float)):
+            # 判断是秒还是毫秒（大于1e10认为是毫秒）
+            if dt_value > 1e10:
+                dt_value = dt_value / 1000
+            dt = datetime.fromtimestamp(dt_value)
+        # 如果是字符串（ISO格式）
+        elif isinstance(dt_value, str):
+            # 替换 Z 为 +00:00 以兼容 Python 3.6+
+            dt_str = dt_value.replace('Z', '+00:00')
+            # 尝试解析 ISO 格式
+            try:
+                dt = datetime.fromisoformat(dt_str)
+            except:
+                # 如果解析失败，直接返回原字符串
+                return dt_value
+        else:
+            return str(dt_value)
+        
+        # 格式化为中文日期时间格式
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+    except Exception as e:
+        # 格式化失败返回原值
+        return str(dt_value)
 
 
 # =============================================================================
@@ -264,12 +300,16 @@ def _parse_document_response(data: Dict) -> Dict[str, Any]:
     
     documents = []
     for doc in docs:
+        # 格式化更新日期
+        updated_at = doc.get("update_time") or doc.get("create_time")
+        formatted_date = _format_datetime(updated_at)
+        
         documents.append({
             "id": doc.get("id", ""),
             "title": doc.get("name", "未命名文档"),
             "content": doc.get("content", "") or doc.get("description", "暂无描述"),
             "type": doc.get("type", "未知"),
-            "updated_at": doc.get("update_time", doc.get("create_time", "未知")),
+            "updated_at": formatted_date,
             "chunk_count": doc.get("chunk_count", 0),
             "token_count": doc.get("token_count", 0),
             "progress": doc.get("progress", 0),
@@ -314,6 +354,17 @@ async def upload_to_ragflow(file: UploadFile, file_content: bytes) -> Dict[str, 
             if response.status_code == 200:
                 result = response.json()
                 logger.info(f"[RAGFlow Upload] Response Body: {json.dumps(result, ensure_ascii=False)[:2000]}...")
+                
+                # 获取上传成功的 document_ids
+                document_ids = _extract_document_ids(result)
+                if document_ids:
+                    logger.info(f"[RAGFlow Upload] Extracted document_ids: {document_ids}")
+                    # 调用文档解析 API
+                    parse_result = await _parse_documents(client, base_url, dataset_id, api_key, document_ids)
+                    logger.info(f"[RAGFlow Upload] Parse result: {parse_result}")
+                else:
+                    logger.warning("[RAGFlow Upload] No document_ids found in response, skipping parse")
+                
                 logger.info("[RAGFlow Upload] Upload successful")
                 return {"success": True, "data": result}
             else:
@@ -342,3 +393,69 @@ def _log_upload_request(url: str, file: UploadFile, file_size: int, data: Dict):
     logger.info(f"[RAGFlow Upload] File Size: {file_size} bytes")
     logger.info(f"[RAGFlow Upload] Parser Config: {data['parser_config']}")
     logger.info("=" * 80)
+
+
+def _extract_document_ids(result: Dict[str, Any]) -> List[str]:
+    """从上传响应中提取 document_ids"""
+    document_ids = []
+    try:
+        # 根据 RAGFlow 响应结构提取 document_ids
+        # 通常在 data 字段下的 docs 数组中
+        docs = result.get("data", [])
+        for doc in docs:
+            doc_id = doc.get("id")
+            if doc_id:
+                document_ids.append(doc_id)
+    except Exception as e:
+        logger.error(f"[RAGFlow Upload] Error extracting document_ids: {e}")
+    return document_ids
+
+
+async def _parse_documents(
+    client: httpx.AsyncClient,
+    base_url: str,
+    dataset_id: str,
+    api_key: str,
+    document_ids: List[str]
+) -> Dict[str, Any]:
+    """
+    调用 RAGFlow 文档解析 API
+    POST /api/v1/datasets/{dataset_id}/chunks
+    """
+    try:
+        url = f"{base_url}/datasets/{dataset_id}/chunks"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "document_ids": document_ids
+        }
+        
+        logger.info("=" * 80)
+        logger.info("[RAGFlow Parse] REQUEST")
+        logger.info(f"[RAGFlow Parse] URL: {url}")
+        logger.info(f"[RAGFlow Parse] Document IDs: {document_ids}")
+        
+        response = await client.post(url, headers=headers, json=payload)
+        
+        logger.info("[RAGFlow Parse] RESPONSE")
+        logger.info(f"[RAGFlow Parse] Status Code: {response.status_code}")
+        
+        if response.status_code == 200:
+            result = response.json()
+            logger.info(f"[RAGFlow Parse] Response: {json.dumps(result, ensure_ascii=False)[:1000]}...")
+            logger.info("[RAGFlow Parse] Parse request sent successfully")
+            return {"success": True, "data": result}
+        else:
+            error_text = response.text
+            logger.error(f"[RAGFlow Parse] HTTP Error: {response.status_code}")
+            logger.error(f"[RAGFlow Parse] Error Response: {error_text}")
+            return {"success": False, "error": f"HTTP {response.status_code}: {error_text}"}
+            
+    except Exception as e:
+        logger.error(f"[RAGFlow Parse] Exception: {e}")
+        logger.error(f"[RAGFlow Parse] Exception Type: {type(e).__name__}")
+        import traceback
+        logger.error(f"[RAGFlow Parse] Traceback: {traceback.format_exc()}")
+        return {"success": False, "error": str(e)}
