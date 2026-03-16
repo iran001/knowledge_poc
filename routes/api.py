@@ -654,11 +654,14 @@ async def proxy_link(request: ProxyLinkRequest):
             
             # 返回响应内容，附加原始文件名到自定义 header（用于文件下载）
             from fastapi.responses import Response
+            from urllib.parse import quote
             response_headers = {
                 "Content-Type": content_type
             }
             if original_filename:
-                response_headers["X-Original-Filename"] = original_filename
+                # 对文件名进行 URL 编码，避免中文导致的 latin-1 编码错误
+                encoded_filename = quote(original_filename, safe='')
+                response_headers["X-Original-Filename"] = encoded_filename
             
             return Response(
                 content=response.content,

@@ -920,8 +920,17 @@
                 const blob = await response.blob();
                 const contentType = response.headers.get('Content-Type') || 'application/octet-stream';
                 
-                // 优先从后端返回的 header 中获取文件名
+                // 优先从后端返回的 header 中获取文件名（URL 编码，需要解码）
                 let filename = response.headers.get('X-Original-Filename');
+                
+                // 对文件名进行 URL 解码（处理中文等字符）
+                if (filename) {
+                    try {
+                        filename = decodeURIComponent(filename);
+                    } catch (e) {
+                        console.error('Decode filename error:', e);
+                    }
+                }
                 
                 // 如果后端没有提供文件名，从 URL 中提取或使用默认名称
                 if (!filename) {
