@@ -25,15 +25,14 @@ def update_dify_uploaded_files(filename: str, file_id: str, conflict_filename: O
     Args:
         filename: 新上传的文件名
         file_id: 新上传文件的 Dify file_id
-        conflict_filename: 如果替换了冲突文件，需要移除的文件名
+        conflict_filename: 如果替换了冲突文件，记录被替换的文件名（仅用于日志，不删除配置）
     """
     try:
-        # 先删除冲突文件记录（如果存在且不同于新文件名）
-        if conflict_filename and conflict_filename in DIFY_UPLOADED_FILES and conflict_filename != filename:
-            del DIFY_UPLOADED_FILES[conflict_filename]
-            logger.info(f"[Config Update] Removed conflict file record: {conflict_filename}")
+        # 记录冲突文件替换信息（但不删除原配置）
+        if conflict_filename and conflict_filename != filename:
+            logger.info(f"[Config Update] Replacing conflict file: {conflict_filename} -> {filename}")
         
-        # 更新内存中的配置（添加新文件记录）
+        # 更新内存中的配置（添加/更新新文件记录）
         DIFY_UPLOADED_FILES[filename] = file_id
         
         # 更新 config.py 文件

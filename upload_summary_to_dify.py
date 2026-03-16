@@ -156,16 +156,50 @@ def write_config_content(content: str):
         f.write(content)
 
 
-def update_config_with_uploaded_files(uploaded_files: Dict[str, str]):
+def update_config_with_uploaded_files(uploaded_files: Dict[str, str], mode: str = "incremental"):
     """
     更新 config.py 文件，添加或更新 DIFY_UPLOADED_FILES 配置
     
     Args:
-        uploaded_files: {文件名: file_id} 的字典
+        uploaded_files: {文件名: file_id} 的字典（本次上传的文件）
+        mode: 更新模式
+            - "incremental": 增量更新，保留已有配置，只更新/添加新文件（默认）
+            - "replace": 完全替换，只保留本次上传的文件
     """
     print("\n[信息] 正在更新 config.py...")
     
     config_content = read_config_content()
+    
+    # 尝试从现有配置中读取已上传的文件映射
+    existing_files: Dict[str, str] = {}
+    if mode == "incremental" and "DIFY_UPLOADED_FILES" in config_content:
+        try:
+            import re
+            # 尝试匹配 DIFY_UPLOADED_FILES = {...}
+            pattern = r'DIFY_UPLOADED_FILES:.*?Dict\[str, str\].*?=\s*(\{.*?\})'
+            match = re.search(pattern, config_content, re.DOTALL)
+            if match:
+                dict_str = match.group(1)
+                existing_files = json.loads(dict_str)
+                print(f"[信息] 发现已有 {len(existing_files)} 个文件配置，将增量更新")
+        except Exception as e:
+            print(f"[警告] 读取现有配置失败: {e}，将创建新配置")
+    
+    # 合并配置：保留现有文件，更新/添加新文件
+    merged_files = existing_files.copy()
+    updated_count = 0
+    added_count = 0
+    
+    for filename, file_id in uploaded_files.items():
+        if filename in merged_files:
+            if merged_files[filename] != file_id:
+                print(f"[更新] {filename}: {merged_files[filename][:8]}... -> {file_id[:8]}...")
+                updated_count += 1
+            merged_files[filename] = file_id
+        else:
+            print(f"[添加] {filename}: {file_id[:8]}...")
+            merged_files[filename] = file_id
+            added_count += 1
     
     # 准备新的配置项
     new_config = f"""
@@ -173,7 +207,7 @@ def update_config_with_uploaded_files(uploaded_files: Dict[str, str]):
 # Dify 已上传文件记录（自动生成的文件 ID 映射）
 # 文件名 -> Dify file_id
 # =============================================================================
-DIFY_UPLOADED_FILES: Dict[str, str] = {json.dumps(uploaded_files, ensure_ascii=False, indent=4)}
+DIFY_UPLOADED_FILES: Dict[str, str] = {json.dumps(merged_files, ensure_ascii=False, indent=4)}
 """
     
     # 检查是否已存在 DIFY_UPLOADED_FILES 配置
@@ -182,7 +216,7 @@ DIFY_UPLOADED_FILES: Dict[str, str] = {json.dumps(uploaded_files, ensure_ascii=F
         import re
         # 使用正则表达式替换整个 DIFY_UPLOADED_FILES 定义
         pattern = r'DIFY_UPLOADED_FILES:.*?Dict\[str, str\].*?=.*?\{[^}]*\}'
-        replacement = f'DIFY_UPLOADED_FILES: Dict[str, str] = {json.dumps(uploaded_files, ensure_ascii=False, indent=4)}'
+        replacement = f'DIFY_UPLOADED_FILES: Dict[str, str] = {json.dumps(merged_files, ensure_ascii=False, indent=4)}'
         
         # 如果上面的正则不匹配，尝试匹配多行格式
         if not re.search(pattern, config_content, re.DOTALL):
@@ -211,7 +245,7 @@ DIFY_UPLOADED_FILES: Dict[str, str] = {json.dumps(uploaded_files, ensure_ascii=F
     
     write_config_content(new_content)
     print("[成功] config.py 已更新")
-    print(f"[信息] 记录了 {len(uploaded_files)} 个文件的上传信息")
+    print(f"[统计] 新增: {added_count}, 更新: {updated_count}, 总计: {len(merged_files)}")
 
 
 def main():
@@ -249,9 +283,9 @@ def main():
         else:
             fail_count += 1
     
-    # 更新 config.py
+    # 更新 config.py（增量更新模式：保留已有配置，只更新/添加新文件）
     if uploaded_files:
-        update_config_with_uploaded_files(uploaded_files)
+        update_config_with_uploaded_files(uploaded_files, mode="incremental")
     
     # 输出统计
     print("\n" + "=" * 80)
