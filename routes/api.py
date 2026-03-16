@@ -29,7 +29,6 @@ from services import (
     call_dify_conflict_check_with_files,
     fetch_documents_from_api,
     upload_to_ragflow,
-    update_dify_uploaded_files,
 )
 
 
@@ -475,8 +474,8 @@ async def _handle_first_upload(file: UploadFile, file_content: bytes, filename: 
     upload_result = await upload_to_ragflow(file, file_content)
     
     if upload_result["success"]:
-        update_dify_uploaded_files(filename, newfile_id)
-        logger.info("[Upload Document] Direct upload successful (first file)")
+        # 上传成功后不更新 DIFY_UPLOADED_FILES
+        logger.info("[Upload Document] Direct upload successful (first file, DIFY_UPLOADED_FILES unchanged)")
         return {"success": True, "message": "文件上传成功", "filename": file.filename}
     else:
         logger.error(f"[Upload Document] Upload failed: {upload_result.get('error')}")
@@ -575,8 +574,8 @@ async def _upload_to_ragflow_and_save(file: UploadFile, file_content: bytes, fil
     upload_result = await upload_to_ragflow(file, file_content)
     
     if upload_result["success"]:
-        update_dify_uploaded_files(filename, newfile_id)
-        logger.info("[Upload Document] Upload successful")
+        # 上传成功后不更新 DIFY_UPLOADED_FILES
+        logger.info("[Upload Document] Upload successful (DIFY_UPLOADED_FILES unchanged)")
         return {"success": True, "message": "文件上传成功", "filename": file.filename}
     else:
         logger.error(f"[Upload Document] Upload failed: {upload_result.get('error')}")

@@ -368,7 +368,7 @@
                     '<span>更新日期: ' + escapeHtml(doc.updated_at || '未知') + '</span>' +
                     (doc.chunk_count !== undefined ? '<span>分块数: ' + doc.chunk_count + '</span>' : '') +
                     (doc.token_count !== undefined ? '<span>Token数: ' + doc.token_count + '</span>' : '') +
-                    (doc.progress !== undefined && doc.progress < 100 ? '<span>解析进度: 100%</span>' : '') +
+                    (doc.progress !== undefined ? '<span>解析进度: ' + (doc.progress * 100).toFixed(2) + '%</span>' : '') +
                 '</div>' +
                 '<div class="doc-summary">' + escapeHtml(contentPreview) + '</div>' +
                 '<div class="doc-detail" id="detail-' + index + '" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">' +
