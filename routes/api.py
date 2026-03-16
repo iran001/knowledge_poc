@@ -501,8 +501,8 @@ async def _handle_force_replace(
     upload_result = await upload_to_ragflow(file, file_content)
     
     if upload_result["success"]:
-        update_dify_uploaded_files(filename, newfile_id, conflict_file if conflict_file else None)
-        logger.info("[Upload Document] Force replace upload successful")
+        # 冲突替换后不更新 DIFY_UPLOADED_FILES，保持原配置不变
+        logger.info("[Upload Document] Force replace upload successful (DIFY_UPLOADED_FILES unchanged)")
         return {"success": True, "message": "文件已成功替换并上传到知识库", "filename": file.filename}
     else:
         logger.error(f"[Upload Document] Force replace upload failed: {upload_result.get('error')}")

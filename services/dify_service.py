@@ -138,7 +138,7 @@ async def call_dify_conflict_check_with_files(newfile_id: str, overfile_ids: lis
         
         _log_conflict_check_request(url, newfile_id, overfile_ids, payload)
         
-        async with httpx.AsyncClient(timeout=120) as client:
+        async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, json=payload, headers=headers)
 
             logger.info("[Dify Conflict Check] RESPONSE")
@@ -225,7 +225,7 @@ async def call_dify_conflict_check(new_file_content: str, existing_file_content:
         
         _log_text_conflict_request(url, len(new_file_content), len(existing_file_content))
         
-        async with httpx.AsyncClient(timeout=120) as client:
+        async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, json=payload, headers=headers)
             return _handle_conflict_response(response)
 
@@ -326,7 +326,7 @@ async def call_dify_chat(role: str, message: str, conversation_id: str, system_p
         logger.info(f"[Dify Chat API] URL: {url}")
         logger.info(f"[Dify Chat API] Payload: {json.dumps(payload, ensure_ascii=False)[:500]}...")
         
-        async with httpx.AsyncClient(timeout=float(DIFY_CONFIG.get("timeout", 60))) as client:
+        async with httpx.AsyncClient(timeout=float(DIFY_CONFIG.get("timeout", 180))) as client:
             response = await client.post(url, json=payload, headers=headers)
             
             logger.info("[Dify Chat API] RESPONSE")
