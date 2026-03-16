@@ -1,0 +1,24 @@
+[
+  {
+    "role": "user",
+    "content": "手拎袋印刷指南",
+    "think_content": "",
+    "timestamp": "2026-03-16T11:28:25.037898",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  },
+  {
+    "role": "bot",
+    "content": "根据[手拎袋印刷指南.pdf](https://example.com)中的内容，IHG ONE REWARDS（洲际优悦会）手拎袋的印刷规范如下：\n\n- **尺寸**：宽160mm × 高130mm  \n- **纸张**：120g 白牛皮纸 + 牛皮纸提手  \n- **印刷颜色**：黑色 + 保护油  \n- **字体**：\n  - 中文：思源黑体  \n  - 英文：Graphik  \n\n此外，该文档还提供了效果图以供参考。\n\n![](http://118.31.184.47/v1/document/image/3c521b90074b11f1826d0664f063c4fe-7b028506bc38a5bc)\n\n颜色规范部分也包含在指南中，具体色值信息可参考下表所示内容：\n\n![](http://118.31.184.47/v1/document/image/3c521b90074b11f1826d0664f063c4fe-f19bb3a38c1ead14)\n\n参考文献：  \n[手拎袋印刷指南.pdf](https://example.com)\n",
+    "think_content": "",
+    "timestamp": "2026-03-16T11:28:25.055105",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  }
+]
