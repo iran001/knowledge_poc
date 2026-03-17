@@ -1,0 +1,24 @@
+[
+  {
+    "role": "user",
+    "content": "易宝支付操作流程",
+    "think_content": "",
+    "timestamp": "2026-03-17T14:03:38.611589",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  },
+  {
+    "role": "bot",
+    "content": "易宝支付的操作流程主要分为**预订业务流程**和**退改业务流程**，适用于洲际酒店（IHG）与TMC（差旅管理公司）之间的B2B支付场景。\n\n### 1. TMC订单-预订业务流程\n根据 [IHG B2B Payment Solution YeePay SOP_CN.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/4178bddd1e7611f1928be67a6a3f482a) 和 [YeePay易宝支付-酒店后台操作手册.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/31bbde261e2011f1bdbae67a6a3f482a) 的说明，具体步骤如下：\n\n1. **TMC通过API进行预订**，并在【Special Request】字段中注明：“该订单通过易宝支付完成支付，请通过酒店确认号去易宝后台进行查询，确认到账情况”。\n2. **洲际酒店系统自动返回【酒店确认号】**，确认预订成功。\n3. **TMC将【酒店确认号】作为商户订单号**，通过易宝的<自动付款>API发起实时付款，款项将自动到账至酒店的易宝账户。\n4. **客人到店办理入住**。\n5. **酒店前台工作人员在PMS系统中看到【Special Request】备注后**，登录易宝商户后台，确认该订单已付款。\n6. **客人成功入住**。\n7. **若客人需要续住**，需联系TMC说明需求，TMC将通过易宝API重新发起新订单并支付，重复上述1-6步骤。\n\n![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-062695ed8babbae7)\n\n### 2. TMC订单-退改业务流程\n当发生订单取消、提前离店或入住/离店时间完全变更时，流程如下：\n\n1. **客人联系TMC说明退改需求**。\n2. **TMC与洲际酒店预订部通过电话或邮件沟通**，更新订单信息。\n3. **酒店预订部根据酒店-TMC退改政策**，确认可退款订单及金额，并通知财务部。\n4. **酒店财务部工作人员登录易宝商户后台**，执行退款操作。\n5. **对于智选假日品牌酒店**，可自行协调相关人员承担预订部相关工作。\n\n![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-062695ed8babbae7)\n\n### 3. 酒店后台操作界面示例\n酒店工作人员可通过易宝支付商户管理后台查询订单、确认付款状态及处理退款。后台界面包括“收款 > 订单查询”等功能模块，支持按时间、订单号、状态等条件筛选，并可下载交易明细。\n\n![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-f8c7120a1ef66604)\n\n### 4. 支持与联系方式\n- **易宝客服热线**: 95070\n- **易宝联系人**: 王琦 (Cindy Wang)，手机：+86 15849177460（微信），邮箱：qi.wang-3@yeepay.com\n- **洲际联系人**: Ike Zhang，手机：+86 8621600621，邮箱：ike.zhang@ihg.com\n- **文件下载**: 请在IHG Pedia (pedia.ihg.com.cn) 搜索关键字 ‘YeePay’ 下载相关操作文档。\n\n参考文献：\n[IHG B2B Payment Solution YeePay SOP_CN.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/4178bddd1e7611f1928be67a6a3f482a)\n[YeePay易宝支付-酒店后台操作手册.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/31bbde261e2011f1bdbae67a6a3f482a)\n",
+    "think_content": "",
+    "timestamp": "2026-03-17T14:03:38.622082",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  }
+]
