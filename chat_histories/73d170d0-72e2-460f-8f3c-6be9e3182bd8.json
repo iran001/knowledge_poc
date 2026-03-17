@@ -1,0 +1,24 @@
+[
+  {
+    "role": "user",
+    "content": "会员转化率",
+    "think_content": "",
+    "timestamp": "2026-03-17T14:22:33.706204",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  },
+  {
+    "role": "bot",
+    "content": "关于“会员转化率”，根据知识库内容，IHG优悦会体系中所指的**会员招募转化率**（Member Recruitment Conversion Rate）是衡量酒店在非会员宾客入住过程中成功将其转化为合格会员的比例。\n\n---\n\n### 一、定义与计算公式\n\n根据[会员招募转化率快速参考指南.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/fc8fe15e1e7b11f1a69be67a6a3f482a)和[Enrollment Efficiency_QuickReference_GC_ZH-CN.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/fc81a7251e7b11f1a632e67a6a3f482a)，会员招募转化率的计算方式如下：\n\n$$\n\\text{会员招募转化率} = \\frac{\\text{附带有效电邮地址或手机号码的合格会员招募}}{\\text{非会员住宿 + 会员入会住宿 (Enrolling Stay)}}\n$$\n\n- **分子**：成功招募并提供有效联系方式（邮箱或手机号）的新会员数量；\n- **分母**：所有非会员入住次数 + 入住时完成入会的“入会住宿”（Enrolling Stay）次数。\n\n该指标用于评估酒店在实际接触非会员宾客的机会中，成功转化的比例。\n\n![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-b37f98606aa4a749)\n\n---\n\n### 二、实际表现与目标\n\n#### 1. **2025年目标**\n根据[Loyalty Enrollment Dashboard User Guide_ZH_250306(1).pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/6d24a2731e7411f18b90e67a6a3f482a)，2025年设定的**会员招募转化率目标为26%**。截至2025年2月，实际年至今（YTD）转化率为**31.6%**，已超出目标5.6个百分点。\n\n![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-9fd1c20bb876dfce)\n\n#### 2. **大中华区细分数据（截至2025年9月）**\n来自[2025 Loyalty Leader Workshop Deck1.pdf](http://118.31.184.47/api/v1/datasets/9e91232c04e811f18c9e0664f063c4fe/documents/a6c74a9c1df911f1bda1e67a6a3f482a)的数据显示：\n- **前台招募转化率**：全年波动在22.3%–29.6%之间，年累计为**25.4%**；\n- **自助招募转化率**：较低，全年在1.3%–7.0%之间，年累计为**4.5%**；\n- **整体会员招募转化率**：**29.9%**（年累计）。\n\n北区酒店表现类似，整体年累计转化率达**29.1%**。\n\n![](http://118.31.184.47/v1/document/image/9e91232c04e811f18c9e0664f063c4fe-093504d9adbe5532)\n\n#### 3. **2024年按品牌表现**\n根据[2024 Q3 Loyalty Leader Webinar.pdf](http://118.31.184.47/api/v1/datasets/9e91232c04e811f18c9e0664f063c4fe/documents/78c6d6251e0211f18de8e67a6a3f482a)：\n- **智选假日酒店**（Holiday Inn Express）：全年转化率稳定在**24.9%–26.9%**，远超22%目标；\n- **特许经营全服务酒店**：多数月份接近或略超22%目标，7–8月达**23.5%**。\n\n![](http://118.31.184.47/v1/document/image/9e91232c04e811f18c9e0664f063c4fe-dd6bf590b0cf76b5)\n\n---\n\n### 三、管理建议\n\n根据[会员招募转化率快速参考指南.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/fc8fe15e1e7b11f1a69be67a6a3f482a)，酒店应：\n- 设定每日/每周招募目标；\n- 使用**宾客抵达报告**识别非会员机会；\n- 开展角色扮演培训；\n- 庆祝团队成功以提升积极性。\n\n---\n\n参考文献：  \n[会员招募转化率快速参考指南.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/fc8fe15e1e7b11f1a69be67a6a3f482a)  \n[Enrollment Efficiency_QuickReference_GC_ZH-CN.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/fc81a7251e7b11f1a632e67a6a3f482a)  \n[Loyalty Enrollment Dashboard User Guide_ZH_250306(1).pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/6d24a2731e7411f18b90e67a6a3f482a)  \n[2025 Loyalty Leader Workshop Deck1.pdf](http://118.31.184.47/api/v1/datasets/9e91232c04e811f18c9e0664f063c4fe/documents/a6c74a9c1df911f1bda1e67a6a3f482a)  \n[2024 Q3 Loyalty Leader Webinar.pdf](http://118.31.184.47/api/v1/datasets/9e91232c04e811f18c9e0664f063c4fe/documents/78c6d6251e0211f18de8e67a6a3f482a)\n",
+    "think_content": "",
+    "timestamp": "2026-03-17T14:22:33.718475",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  }
+]

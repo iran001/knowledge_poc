@@ -1,0 +1,24 @@
+[
+  {
+    "role": "user",
+    "content": "导致会员招募无法成为\"合格招募\"的常见原因有哪些？",
+    "think_content": "",
+    "timestamp": "2026-03-17T14:21:30.354801",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  },
+  {
+    "role": "bot",
+    "content": "导致会员招募无法成为“合格招募”的常见原因包括以下几点：\n\n- **会员招募时间不符合规定**：招募时间早于入住前24小时，或晚于退房时；\n- **未与有效入住记录关联**：招募未与该酒店的有效入住记录（stay）相关联；\n- **非入住酒店完成招募**：招募并非由宾客实际入住的酒店完成；\n- **系统中存在重复记录**：该会员在洲际优悦会（IHG One Rewards）系统中已有注册记录，造成重复；\n- **缺少有效联系方式**：招募信息中未包含有效的电邮地址或手机号码。\n\n以上内容依据 [会员招募指南-Enrollment Guide GC 2025_v2_ZHCN.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/79f7fa5f1e2211f18f82e67a6a3f482a) 和 [2025 Loyalty Leader Workshop Deck1.pdf](http://118.31.184.47/api/v1/datasets/9e91232c04e811f18c9e0664f063c4fe/documents/a6c74a9c1df911f1bda1e67a6a3f482a) 中关于“合格的会员招募”（Qualified Enrollments）的定义整理得出。\n\n![](http://118.31.184.47/v1/document/image/31f6e5b81e1411f18dd4e67a6a3f482a-3ff3921c1a3f54e5)\n\n参考文献：  \n[会员招募指南-Enrollment Guide GC 2025_v2_ZHCN.pdf](http://118.31.184.47/api/v1/datasets/31f6e5b81e1411f18dd4e67a6a3f482a/documents/79f7fa5f1e2211f18f82e67a6a3f482a)  \n[2025 Loyalty Leader Workshop Deck1.pdf](http://118.31.184.47/api/v1/datasets/9e91232c04e811f18c9e0664f063c4fe/documents/a6c74a9c1df911f1bda1e67a6a3f482a)\n",
+    "think_content": "",
+    "timestamp": "2026-03-17T14:21:30.365151",
+    "metadata": {
+      "user_id": "admin",
+      "user_role": "admin",
+      "user_display_name": "系统管理员"
+    }
+  }
+]
